@@ -1,0 +1,55 @@
+\chapter{Backend}
+
+Ze względu na ogrom informacji i potrzebę istnienia miejsca w którym połączymy lokalizację punktów dostępów z ich identyfikatorami zdecydowałem się na stworzenie aplikacji serwerowej. 
+
+\section{Technologia}
+
+Ze względu na moje doświadczenie przy pracy z technologią Ruby on Rails, właśnie to rozwiązanie zostało wybrane.
+
+Możliwe alternatywy:
+ - C Sharp - MVC
+ - PHP
+ - Node.js (+ Express)
+ - Java
+ - Python Django
+
+Baza danych : postgres
+
+Alternatywy:
+ - SQLite
+ - MySQL
+ - MSSQL
+ - Mongodb
+ 
+ 
+\subsection{MVC}
+Opisanie wzorca architektoniczego MVC
+
+\subsection{Stack technolgoiczny}
+Coś o dockerze(ngnix proxy). Coś o azure. Dlaczego Cloudflare?
+
+% może jakieś screenshoty z panelu azure?
+
+
+\section{Implementacja}
+
+Implementację rozpocząłem od importu istniejących danych o lokalizacjach sieci wifi z różnych serwisów.
+
+\subsection{Istniejące dane}
+
+Cztery serwisy udostępniają dumpy bazy, ich nazwy razem z rozmiarem spakowanych danych które udostępniają:
+ - openwifi.su - 48MB - CSV spakowany do tar.bz2
+ - radiocells.org - 1.6GB - baza danych sqlite
+ - mylnikov.org - 657 MB - CSV spakowany do zip
+ - openwlanmap - 231 - CSV spakowany do tar.bz2
+
+Ze względu na wielkość importowanych danych i ograniczoną wydajność, ograniczyłem import danych do koorydynatów goeograficznych... 
+Zakres ten obejmuje X kilometrów kwadratowych. Można opisać, dla uproszczenia że obszar ten na północnym zachodzie kończy się na ..., na północnych wschodzie na ..., na południowym wschodzie na ... oraz na południowym zachodzie na ...
+
+%TODO: obrazek z wizualizacją granic 
+
+
+Po zaimportowaniu danych zrobiłem analizę i zauważyłem, że dane pomiędzy tymi bazami nie są unikalne czego można było się akurat spodziewać. Jednak, że dane w ramach jednej bazy danych też się powtarzają.
+
+% https://static.googleusercontent.com/media/www.google.com/pl//googleblogs/pdfs/google_submission_dpas_wifi_collection.pdf
+

@@ -1,0 +1,18 @@
+\chapter{Analiza problemu}
+Dostep do internetu - posiadanie na telefonie bazy danych wszystkich lokalizacji sieci wifi jest dosyć nierealistyczne ponieważ rozmiar danych dla warszawy to byłoby około 40MB danych przedstawionych w formacie CSV lub 9MB dla spakowanego archiwum tych danych. Dodaktowo dochodzi element obliczania lokalizacji na tak rozległych danych. Gdy natomiast, wziąć pod uwagę bazę stacji GSM. To taka baza jest dużo mniejsza, oraz jej dane nie zmieniają się tak często. Taką bazę można umieszczać na urządzeniach by ustalały lokalizację w sposób stuprocentowy offline i anonimowo. Niestety lokalizacja na podstawie puntków stacji GSM jest niedokładna. Średnia dokładność dla lokalizacji ustalonej na bazie nadajników GSM to 3000m. Gdzie dla sieci wifi to 30m
+
+%TODO? jakieś źródła tych dokładności lokalizacji by się przydały. Np. na podstawie 
+
+Podczas gdy użytkownik ma dostęp do internetu, to można go zlokalizować na podstawie adresu ip. Podanych sieci wifi które ma w zasięgu. Podanych stacji GSM które ma w zasięgu.
+
+%TODO: Skompresowane dane do lokalizowania się w Warszawie? Czy możliwe jest zapisanie lokalizacji sieci wifi w taki sposób aby zajmowały mało miejsca, nie były kosztowne do obliczenia, offline?
+\section{Przetwarzanie danych osobowych}
+
+\subsection{Standard \_nomap}
+Google zaproponowało dopisywanie do końca nazwy sieci _nomap aby ich urządzenia nie zbierały danych
+\subsection{Zbieranie nazw sieci wifi}
+Prawo w stanach zabrania
+%jakieś źródła czy cuś
+
+\section{Lokalizacja sieci wifi a wpa.darkircop.org}
+Na stronie wpa.darkircop.org możemy znaleźć 

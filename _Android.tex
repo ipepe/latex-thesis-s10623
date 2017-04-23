@@ -1,0 +1,109 @@
+\chapter{Szkic kolejnych rozdziałów}
+
+
+Jak często jest w stanie Android skanować w poszukiwaniu WIFI?
+
+Dokładność ostatniej pozycji GPS w metrach
+
+Zmierzona wartość + estymacja vs rzeczywiste położenie punktu dostępowego
+
+Problem tej pracy składa się z dwóch części:
+ - Zbieranie i przetwarzanie danych
+ - Lokalizowanie użytkownika na podstawie bazy danych lokalizacji punktów dostępu.
+ 
+Sam problem zbierania danych też składa się z wielu części:
+ - częstotliwość odświeżania koordynatów GPS
+ - częstotliwość odświeżania sieci WIFI w zasięgu
+ - zbieranie danych w budynkach, tunelach i innych miejsach o ograniczonym dostępie do GPS.
+ 
+
+Źródła lokalizacji sieci wifi - https:\/\/en.wikipedia.org\/wiki\/Wi-Fi\_positioning\_system
+
+Rozmiar baz danych z informacjami o lokalizacji sieci wifi
+
+Powody do lokalizowania bez gps:
+ - laptopy nie mają gps
+ - szybsze określenie pierwszej lokalizacji wifi
+ - mniejsze zuużycie energii
+ 
+Zasięg i lokalizowanie. 5GHz vs 2GHz
+
+Wizualizacja rozproszenia sygnału wifi
+https://jasmcole.com/2014/08/25/helmhurts/
+The Helmholtz equation
+This gif is a particular case of wave propagation. Only one frequency. And the materials of the walls are idealized, which inherently is inaccurate. In reality, the permeability of common household materials is hard to find and varies with frequency. The source is also idealized as a point source, not a monopole. And, iirc the reflections are not accounted for. 
+
+
+Wyrzucac accespointy ktore sa telefonami/androidami/iosami ale tez Huawei MiFi
+
+Aplikacja Android
+
+    Co wiadomo o sieci Wifi w Androidzie? klasa ScanResult (rzeczywistość na przykładzie Nexus 5 + dokumentacja)
+    Jak szybko można skanować sieci Wifi w Androidzie? * Moreover, you still need to scan the 12 Wi-fi channels to be sure that you are detecting all access points. An access point broadcasts a beacon every 100ms * 12 channels = 1.2 seconds. Spending less time than that and you risk missing access points. (z http://stackoverflow.com/questions/9533476/increasing-wifi-scan-rate)
+    
+Location provider: https:\/\/www.radiocells.org\/geolocation
+
+
+
+Bazy danych
+
+    Porównanie ile jest zmapowanych sieci w Warszawie do np innych miast?
+    Porównanie ile sieci zostało wykorzystanych z całej puli?
+    Porównanie jak często dumpy mają powtarzające się dane?
+
+
+Aplikacja Railsowa
+
+    Problemy z serializacją obiektów (WifiService) w Railsach (wydajnościowe)
+    Sposób przetrworzenia i serwowania danych dla heatmapy
+    Problemy struktury przechowywania i przetwarzania danych na serwer
+    Problem lokalizowania accesspointa na podstawie posiadanych danych (obrazki), mapowanie korzystając z jednego odbiornika na podstawie zmiany sygnału na zaznaczonej trasie
+        Proste mapowanie
+        Srednie
+        Moje
+    Development aplikacji androidowej na podstawie fork'a z opracowanej od dawna aplikacji i podobnych wymaganiach funkcjonalnych (raczej nie)
+
+
+Apliakacja Androidowa
+
+    Android Studio v2.3.1
+    Gradle 2.1.3
+    com.michaelpardo:activeandroid:3.1.0
+
+Wybrałem bibliotekę ActiveAndroid jako element Object-Relational Mapping (ORM) ze względu na swoje podobieństwo do ActiveRecord ze świata języka programowania Ruby oraz ze względu na użycie bazy SQLite która jest popularnym rozwiązaniem na Androidzie.
+
+Lista wersji androida sdk i popularny kod.
+
+W pierwszym etapie, skupiłem się na skanowaniu wifi oraz na pracy z (Klasa skanująca) oraz ScanResult z pakietu wifi. Zastosowałem prosty linear layout w wersji horyzontalnej. Gdy już miałem wyniki skanowania, to stwierdziłem że trzeba je zapisać w bazie danych korzystając z biblioteki ActiveAndroid. Gdy już skanowanie oraz zapis do bazy danych mamy z głowy, to możemy przejść do bieżącej lokalizacji. W tej kwestii skorzystałem z SmartLocation w trybie pracy Navigate oraz continious. Trzeba pamiętać że takie ustawienie jest niekorzystne dla czasu pracy na baterii. Dodatkowo do widoku LinearLayout dodałem flagę "android wake lock flag" żeby ekran nie usypiał się.
+
+W kolejnym etapie aplikacji mobilnej można się skupić na dodaniu:
+
+    widoku mapy
+    przeniesieniu skanowania wifi do BackgroundService
+
+W tym momencie możemy śmiało zakończyć etap pierwszy. W etapie drugim skupię się na przekazaniu danych do serwera. Etap drugi możemy podzielić na następujące punkty:
+
+    ustalenie formatu przekazywanych danych
+    zmodyfikowanie modelu WifiObservation poprzez dodanie flagi exported
+    utworzenie odpowiednich akcji i widoków w aplikacji mobilnej (konfigurowalny url serwera, przycisk do exportu)
+    możliwość usuwania wyexportowanych danych (oszczędność miejsca na urządzeniu)
+    przyjęcie przekazanych danych na serwerze rails.
+
+Denormalizacja danych
+
+Ze względu na cechę badawczą pracy oraz na proste podejście do problemu, zdecydowałem się na zdenormalizowanie danych w bazie danych aplikacji mobilnej.
+
+Dane zdenormalizowane będą zajmować więcej miejsca ale umożliwą na dokładniejsze lokalizowanie miejsca w którym jest ustawiony accesspoint.
+
+Wszystkie dane będą zapisane w pojedyńczej tabeli. Problem jaki powstaje poprzez taki stan schematu bazy danych jest to, żeby znaleźć, które sieci wifi były znalezione w konkretnym skanie, trzeba szukać sieci o takiej samej wartości seen\_at.
+
+przetwarzanie danych osobowych ( w ameryce nielegalne jest zbieranie ssid)
+
+
+WARDriving!
+
+korelacja nazwy sieci wifi do firm znajdujacych sie w poblizu (todo: znajdz baze danych firm w warszawie)
+
+lokalizacja wiekszosci sieci wifi w publicznych bazach danych znajduje sie "na ulicy" ze względu na metodologię skanowania.
+problem: jak stwierdzić czy sieć wifi znajduje się po lewej stronie ulicy czy po prawej.
+
