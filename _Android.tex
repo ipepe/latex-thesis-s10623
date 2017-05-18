@@ -1,6 +1,24 @@
+\chapter{Android}
+\section{Bezpieczeństwo i anonimowość użytkownika}
+\subsection{Uprawnienia na Android}
+%TODO: opisać nowy system uprawnień na Androidzie
+
+Począwszy od Androida 6.0 (poziom API 23) użytkownicy przyznają uprawnienia do aplikacji podczas uruchamiania aplikacji, a nie podczas instalowania aplikacji. To podejście usprawnia proces instalacji aplikacji, ponieważ użytkownik nie musi przyznać uprawnień podczas instalowania lub aktualizowania aplikacji. Daje to również użytkownikowi większą kontrolę nad funkcjonalnością aplikacji; Na przykład użytkownik może zdecydować się udostępnić kamerę dostęp do aparatu, ale nie do lokalizacji urządzenia. Użytkownik może cofnąć uprawnienia w dowolnym momencie, przechodząc do ekranu Ustawienia aplikacji.\cite{NewPermissionsModelInAndroid60}
+
+\subsection{Uprawnienie do WIFI bez GPS}
+Dla użytkowników smartfonów, którym zależy na anonimowości i prywatności proces lokalizowania na podstawie sieci WIFI może być mało podejrzany.
+
+W przypadku w którym dana aplikacja korzysta tylko z uprawnień do stanu WIFI, może to ukryć prawdziwe zamiary aplikacji. Użytkownik widząc, że aplikacja nie korzysta z uprawnień do lokalizacji, założy, że jego pozycja nie będzie ujawniona - co w rzeczywistości, bedzie nieprawdą.
+
+Dodatkowo w nowej wersji Androida, nawet jeżeli użytkownik jest świadom, że aplikacja może go lokalizować na podstawie sieci wifi. To wyłączenie samego modułu WiFi w telefonie, jest niesktuczene, bo można skanować w poszukiwaniu sieci wifi gdy moduł jest wyłączony z perspektywy użytkownika.
+
+Posiadanie informacji o sieciach do których telefon jest podłączony jest jeszcze bardziej groźne niż sama lokalizacja uzytkownika. Można szacować w jakiej firme użytkownik pracuje na podstawie tego, że smartfon był połączony z daną siecią wifi przez 8 godzin dnia pracy, od 9 do 17. Dodatkowo firmy zazwyczaj mają swoją nazwę ustawioną jako SSID punktu dostępu do swoich sieci. Dodatkowo można lokalizować użytkownika w jego domu, wiedząc do jakiej sieci się łączy w przez resztę dnia (i nocy). To można wstępnie określić że mieszka w danym bloku. A znając adres MAC, można dokładnie określić mieszkanie w którym dana sieć wifi pracuje poprzez przejście z odpowiednim skanerem przez budynek. 
+
+%TODO sprawdzić czy jestem w stanie dostać adres MAC urządzenia Android na którym jest aplikacja zainstalowana.
+Taki skaner mogłby też pokazać czy dane urządzenie jest połączone do sieci, tym samym stwierdzając czy dany użytkownik jest w swoim mieszkaniu czy nie (choć również ta informacja jest dostępna poprzez samą aplikację mobilną).
+
+
 \chapter{Szkic kolejnych rozdziałów}
-
-
 Jak często jest w stanie Android skanować w poszukiwaniu WIFI?
 
 Dokładność ostatniej pozycji GPS w metrach
@@ -106,4 +124,3 @@ korelacja nazwy sieci wifi do firm znajdujacych sie w poblizu (todo: znajdz baze
 
 lokalizacja wiekszosci sieci wifi w publicznych bazach danych znajduje sie "na ulicy" ze względu na metodologię skanowania.
 problem: jak stwierdzić czy sieć wifi znajduje się po lewej stronie ulicy czy po prawej.
-
