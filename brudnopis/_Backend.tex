@@ -1,0 +1,161 @@
+\chapter{Backend}
+
+Ze względu na ogrom informacji i potrzebę istnienia miejsca w którym połączymy lokalizację punktów dostępów z ich identyfikatorami zdecydowałem się na stworzenie aplikacji serwerowej. 
+
+\section{Technologia}
+
+Ze względu na moje doświadczenie przy pracy z technologią Ruby on Rails, właśnie to rozwiązanie zostało wybrane.
+
+Możliwe alternatywy:
+ - C Sharp - MVC
+ - PHP
+ - Node.js (+ Express)
+ - Java
+ - Python Django
+
+Baza danych : postgres
+
+Alternatywy:
+ - SQLite
+ - MySQL
+ - MSSQL
+ - Mongodb
+ 
+ 
+\subsection{MVC}
+Opisanie wzorca architektoniczego MVC
+
+\subsection{CRUD - REST/SOAP}
+
+\subsection{JSON/HTML}
+
+\subsection{Stack technolgoiczny}
+Coś o dockerze(ngnix proxy). Coś o azure. Dlaczego Cloudflare?
+
+% może jakieś screenshoty z panelu azure?
+
+\section{Implementacja}
+
+Implementację rozpocząłem od importu istniejących danych o lokalizacjach sieci wifi z różnych serwisów.
+
+\subsection{Istniejące dane}
+
+Cztery serwisy udostępniają dumpy bazy, ich nazwy razem z rozmiarem spakowanych danych które udostępniają:
+ - openwifi.su (openwlanmap.org) - 245,7MB - CSV spakowany do tar.bz2
+ - radiocells.org (openbmap) - 1.6GB - baza danych sqlite
+ - mylnikov.org - 657 MB - CSV spakowany do zip
+
+\subsection{Import danych i denormalizacja}
+Ze względu na prędkość importu zdecydowałem się zdenormalizować w tabeli obserwacji punktów dostępów, kolumnę BSSID - opisującą adres sprzętowy urządzenia. Dzięki temu mogłem użyć biblioteki activerecord-import. Która pozwala na import danych do bazy danych poprzez bardzo przyjemny interfejs.
+
+\subsubsection{Dane z mylnikov.org}
+
+Na samej stronie, twórca twierdzi, że jego baza danych jest kompilacją baz openBmap.orb oraz OpenWIFI.su
+
+\subsection{WifiObservation}
+Jako formę reprezentacyjną danych utworzyłem model WifiObservation z następującymi kolumnami:
+
+Do aplikacji dodałem dwa widoki: Mapa obserwacji oraz mapa "ciepła" - która pokazuje zagęszczenie zbadanych sieci wifi.
+
+\subsection{GeoJSON}
+%FeatureCollection
+Przy mapie obserwacji aby zapresentować dane z bazy wybrałem standard GeoJSON. 
+
+\begin{lstlisting}[caption=Ruby geojson\_hash]
+  def geojson_hash
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: geojson_coordinates
+      },
+      properties: {
+        id: id,
+        bssid: bssid
+      }
+    }
+  end
+\end{lstlisting}
+
+Niestety przy generowaniu pięćdziesięciu tysięcy obserwacji punktów dostępów, serwer Railsowy wykonywał dużo przetwarzania danych, co skutkowało bardzo długim czasem odpowiedzi - około dziesięciu sekund.
+
+\subsubsection{Benchmark}
+
+Pomyślałem, że możliwym przyspieszeniem będzie przeniesienie generowania struktury GeoJSON do bazy danych.
+
+\begin{lstlisting}[caption=Ruby geojson\_hash]
+SELECT json_build_object(
+    'type',       'Feature',
+    'id',         gid,
+    'geometry',   ST_AsGeoJSON(geom)::json,
+    'properties', json_build_object(
+        'feat_type', feat_type,
+        'feat_area', ST_Area(geom)::geography
+     )
+) FROM input_table;
+\end{lstlisting}
+
+Niestety, nie zauważyłem różnicy między jednym a drugim rozwiązaniem.
+
+%tutaj wynik z benchmarku
+
+Postanowiłem optymalizować w innych obszarach. Dużym zaskoczeniem było dla mnie, użycie metody to_json na kolekcji przygotowanych danych. Czas odpowiedzi z dziesięciu tysięcy milisekund spadł do czterech tysięcy milisekund dla pięćdziesięciu tysięcy rekordów.
+
+
+To przywiodło mi na myśl, że byłby to idealny moment na sprawdzenie wydajności między różnymi wersjami Rubiego. Projekt na początku utworzyłem na wersji 2.3.3 ze względu na wcześniej przygotowany szablon aplikacji. Stwierdziłem że sprawdzę nowszą wersję - 2.4.1 - oraz konkurującego odpowiednika jruby - 9
+
+\begin{lstlisting}[caption=Benchmark geojson]
+Benchmark.bm do |x|
+  x.report('JSON[pluck_geojson]') { 5.times { JSON[WifiObservation.limit(50_000).pluck_geojson] }}
+  x.report('pluck_geojson.to_json') { 5.times {  WifiObservation.limit(50_000).pluck_geojson.to_json }}
+  x.report('JSON[map(&:geojson_hash)]') { 5.times {  JSON[WifiObservation.limit(50_000).map(&:geojson_hash)] }}
+  x.report('map(&:geojson_hash).to_json') { 5.times {  WifiObservation.limit(50_000).map(&:geojson_hash).to_json }}
+end
+\end{lstlisting}
+
+Ruby 2.3.3:
+
+       user     system      total        real
+JSON[pluck_geojson]  7.970000   0.300000   8.270000 ( 15.635793)
+pluck_geojson.to_json 29.620000   0.630000  30.250000 ( 38.220882)
+JSON[map(&:geojson_hash)] 16.530000   0.510000  17.040000 ( 19.063228)
+map(&:geojson_hash).to_json 38.970000   1.240000  40.210000 ( 43.482492)
+
+Ruby 2.4.1:
+       user     system      total        real
+JSON[pluck_geojson]  7.760000   0.270000   8.030000 ( 15.252685)
+pluck_geojson.to_json 30.350000   0.680000  31.030000 ( 38.310567)
+JSON[map(&:geojson_hash)] 15.190000   0.410000  15.600000 ( 17.504994)
+map(&:geojson_hash).to_json 38.660000   0.940000  39.600000 ( 42.145208)
+
+jruby-9.1.9.0:
+       user     system      total        real
+JSON[pluck_geojson]  2.040000   0.170000   2.210000 (  8.073360)
+pluck_geojson.to_json  5.780000   0.220000   6.000000 ( 10.977538)
+JSON[map(&:geojson_hash)] 74.390000   0.850000  75.240000 ( 32.687321)
+map(&:geojson_hash).to_jsonJava::JavaLang::OutOfMemoryError: GC overhead limit exceeded
+
+
+\subsubsection{Klastrowanie markerów}
+
+Dodatkowym problemem z jakim się spotkałem, to czytelność i jednocześnie wydajność prezentacji dziesięciu tysiecy punktów na w kontrolce map'owej leaflet. Bez użycia klastrowania markerów, Firefox zawieszał się na ponad 20 sekund, aby wyrysować wszystkie punkty na mapie.
+
+
+%Ze względu na wielkość importowanych danych i ograniczoną wydajność, ograniczyłem import danych do koorydynatów goeograficznych... 
+%\subsubsection{Geografia}
+%Zakres ten obejmuje X kilometrów kwadratowych. Można opisać, dla uproszczenia że obszar ten na północnym zachodzie kończy się na ..., na północnych wschodzie na ..., na południowym wschodzie na ... oraz na południowym zachodzie na ...
+
+%TODO: obrazek z wizualizacją granic 
+
+
+%Po zaimportowaniu danych zrobiłem analizę i zauważyłem, że dane pomiędzy tymi bazami nie są unikalne czego można było się akurat spodziewać. Jednak, że dane w ramach jednej bazy danych też się powtarzają.
+
+
+% https://static.googleusercontent.com/media/www.google.com/pl//googleblogs/pdfs/google_submission_dpas_wifi_collection.pdf
+
+
+
+\subsection{Geolokacja - Location Provider}
+%https://developers.google.com/maps/documentation/geolocation/intro
+% https://radiocells.org/geolocation
+% https://www.ghacks.net/2014/02/03/switch-googles-location-service-mozillas-firefox/

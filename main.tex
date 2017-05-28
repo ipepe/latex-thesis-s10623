@@ -11,6 +11,18 @@
 
 \usepackage{lipsum}
 
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\usepackage{caption}
+
+%snippety kodu
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+% koniec - snippety kodu
+
 \author{Patryk Ptasiński}
 \album{10623}
 \title{Nawigacja w warunkach miejskich przy użyciu danych o lokalizacjach sieci WIFI}
@@ -31,12 +43,8 @@
 \baselineskip=22pt
 
 \include{_Wprowadzenie}
-\include{_Demo_Rozdzial}
-\include{_Technologie}
-\include{_Wytwarzanie_oprogramowania}
-\include{_Analiza_problemu}
-\include{_Backend}
-\include{_Android}
+\include{_Teoria}
+\include{_Praktyka}
 \include{_Slownik_pojec}
 
 
