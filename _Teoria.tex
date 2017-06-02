@@ -1,3 +1,28 @@
 \chapter{Część teoretyczna}
 
-Lorem ipsum dolor met.
+W tym rozdziale zostaną przedstawione technologie, przedstawie proces projektowania aplikacji internetowej oraz mobilnej, odwołam się do wzorów i teorii na podstawie, których zostaną stworzone algorytmy w obydwu aplikacjach. Na koniec postawię tezę, którą sprawdzę w Części praktycznej tej pracy.
+
+\section{Projektowanie i planowanie}
+Podstawowym urządzeniem, które będzie częścią tej pracy będzie Smartfon. Ze względu na posiadany na pokładzie odbiornik GPS oraz kartę sieci bezprzeowodowej WIFI. Dodatkowym atutem będzie komunikacja z internetem poprzez sieć GSM. Dzięki takiemu zestawowi technologii w jednym urządzeniu, będziemy mogli porównać estymowaną lokalizację na podstawie wykrytych sieci bezprzewodowych, z lokalizacją zmierzoną przez odbiornik GPS.
+
+%TODO opisanie dlaczego aplikacja internetowa jest wymagana - rozmiar publicznych danych, możliwość dalszego rozwoju dla LocationProvider'ów i geolokacji przeglądarek internetowych
+
+%NOT-TODO: omówienie zależności nazw wifi do okolicznych firm/taksówek
+
+ Publiczne zbiory z zapisanymi lokalizacjami sieci bezprzewodowych mają rozmiary, które przekraczają rozsądne dla urządzeń mobilnych możliwości obliczeniowe.
+
+
+\section{Aplikacja internetowa}
+Na potrzeby tej pracy
+
+\section{Estymacja lokalizacji na podstawie sieci Wifi}
+W przypadku algorytmu estymującego lokalizację użytkownika na podstawie zarejestrowanych sieci bezprzewodowych musimy rozważyć wiele czynników takich jak:
+
+- zmienność lokalizacji urządzeń - duży dostawcy usług jak firma Orange czy UPC, nierzadko się zdarza, że sprawne Routery w funkcją WIFI przydzielają z powrotem do innych klientów.
+%zdjęcie orange funbox
+
+- mobilne hotspoty - smartfony mają możliwość tworzenia Punktów Dostępu dla innych urządzeń. Są też dedykowane rozwiązania takie jak MIFI
+% zdjęcie mifi?
+
+- migracja ludności - na własnym przykładzie mogę powiedzieć, że od 3 lat mam ten sam Punkt Dostępu, a w od kiedy go zakupiłem, przeprowadziłem się już 2 razy. Wielokrotnie miałem sytuacje, w których estymowana lokalizacja z Google, pokazywała okolice mojego poprzedniego zamieszkania.
+% zdjęcie routera ASUS?
