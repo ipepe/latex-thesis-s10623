@@ -1,9 +1,69 @@
 \chapter{Część teoretyczna}
 
-W tym rozdziale zostaną przedstawione technologie, przedstawie proces projektowania aplikacji internetowej oraz mobilnej, odwołam się do wzorów i teorii na podstawie, których zostaną stworzone algorytmy w obydwu aplikacjach. Na koniec postawię tezę, którą sprawdzę w Części praktycznej tej pracy.
+W tym rozdziale zostaną przedstawione technologie, proces projektowania aplikacji internetowej oraz aplikacji mobilnej, odwołam się do teorii na podstawie których zostaną zaimplementowane algorytmy w obydwu aplikacjach. Na koniec postawię tezę, którą sprawdzę w Części praktycznej tej pracy.
+
+\section{Sieć bezprzewodowa}
+To rozwiązanie technologiczne, które przy użyciu fal elektromagnetycznych (promieniowanie radiowe) przesyła informacje między urządzeniami. Najczęściej spotykaną konfiguracją jest układ gwiazdy - jedna stacja bazowa i wiele klientów. 
+
+Stacją bazową, bądź też punktem dostępu (z ang. access point) nazywamy urządzenie, które pracuje w trybie \textit{Infrastructure}. Urządzenia te, rozgłaszają swoją obecność na kanale wybranym przez administratora. %TODO więcej o rozgłaszaniu i wyszukiwaniu
+
+%fale decymetrowe 	VKF 	300-3000 MHz 	1000-100 mm 	Ultra high frequency 	UHF 	mikrofale
+%fale centymetrowe 		3-30 GHz 	100-10 mm 	Super high frequency 	SHF
+% WLAN vs WIFI
+% O standardzie 802.11
+% moc nie większa niż 500mW
+% o kanałach
+% o cechach fal elektromagnetycznych
+% - odbicia, załamania, przenikanie
+% obrazek z symulacją rozchodzenia się fal elektromagnetycznych
+% link do artykułu tego gościa co zrobił aplikację do symulowania odbić sygnału elektromagnetycznego
+
+\section{Geolokalizacja}
+W Słowniku Języka Polskiego możemy przeczytać, że to \textit{ustalenie pozycji geograficznej lub adresu jakiegoś miejsca lub osoby poprzez wykorzystanie GPS lub adresu IP}\cite{GeolokalizacjaSJP}. Jednakże ta definicja dla mojej pracy dyplomowej, jest niepełna. Szukając dodatkowych informacji, zwróciłem się w stronę bardziej popularnego źródła - Wikipedii - i znalazłem rozwinięcie tego konceptu poprzez opisane tam \textit{Sposoby wyznaczania pozycji} w których to znajduje się podpunkt \textit{Pozycjonowanie względne – na podstawie widoczności innych obiektów o znanej pozycji (np. stacji bazowych przez komórkę czy ruterów Wi-Fi przez urządzenie). Ten sposób jest szczególnie istotny, jeśli urządzenie nie ma włączonego odbiornika GPS (oszczędność energii) lub w ogóle go nie posiada (np. laptop).}\cite{GeolokalizacjaWiki}. Ten podpunkt prawie idealnie opisuje koncept geolokalizacji na potrzeby tej pracy. 
+
+Brakuje tylko jednego szczegółu - geolokalizacja jest obarczona takim parametrem jak dokładność. Niezależenie od sposobu, w jaki określamy pozycję lokalizowanego urządzenia, to lokalizowanie zawsze jest na jakimś poziomie dokładności. Na podstawie wniosków z badań Dr. Zandbergen-a z 2011 roku, możemy przyjąć dokładność odbiornika GPS zamontowanego w smartfonie z systemem operacyjnym Android na poziomie od 5 do 8 metrów.\cite{GpsAccurancyZandbergen} W przy dokładności geolokalizacji, warto wspomnieć, że ważnym jest zastosowanie. 
+
+Nie wszystkie potrzeby geolokalizowania wymagają dokładności na wysokim poziomie. Niektóre aplikacje potrzebują informacji jedynie o kraju lub mieście danego urządzenia - użytkownika. Inne potrzebują bardzo dokładnej informacji - w przypadku nawigowania w pomieszczeniach budynków.%tutaj można wspomnieć o projekcie Indoorway
+
+% opisać, że geolokalizacja, jest umieszczona na linii w czasie. Więc poruszające się urządzenie, musi odświeżać swoją lokalizację z określoną częstotliwością. optymalnie byłoby to średnia prędkość w stosunku do dokładności.
+
+\subsection{Geografia}
+%TODO
+% o wspolrzednych geograficznych
+% o wyliczaniu odleglosci
+% o wyliczaniu powierzchni
+% o wyliczaniu zageszczenia sieci Wifi
+
+\subsection{Warunki miejskie}
+Przykładem dla tej pracy jest miasto - stolica - Warszawa. 
+
+\subsection{Geolokalizacja na podstawie sieci bezprzewodowych}
+W przypadku algorytmu estymującego lokalizację użytkownika na podstawie zarejestrowanych sieci bezprzewodowych musimy rozważyć wiele czynników takich jak:
+
+- zmienność lokalizacji urządzeń - duży dostawcy usług jak firma Orange czy UPC, nierzadko się zdarza, że sprawne Routery w funkcją WIFI przydzielają z powrotem do innych klientów.
+%zdjęcie orange funbox
+
+- mobilne hotspoty - smartfony mają możliwość tworzenia Punktów Dostępu dla innych urządzeń. Są też dedykowane rozwiązania rozdawane do abonamentów przez operatorów komórkowych, takie jak MIFI.
+% zdjęcie mifi?
+
+- migracja ludności - na własnym przykładzie mogę powiedzieć, że od 3 lat mam ten sam Punkt Dostępu, a w od kiedy go zakupiłem, przeprowadziłem się już 2 razy. Wielokrotnie miałem sytuacje, w których estymowana lokalizacja z Google, pokazywała okolice mojego poprzedniego zamieszkania.
+% zdjęcie routera ASUS?
+
+\section{Wytwarzanie oprogramowania}
+Podstawowymi metodologiami oraz zagadnieniami przy wytwarzaniu oprogramowania w nowoczesnych środowiskach są:
+
+\subsection{Wersjonowanie kodu źródłowego}
+\subsection{Użyteczność i ergonomia}
+% User Experience
+\subsection{ORM}
+\subsection{MVC}
+
 
 \section{Projektowanie i planowanie}
-Podstawowym urządzeniem, które będzie częścią tej pracy będzie Smartfon. Ze względu na posiadany na pokładzie odbiornik GPS oraz kartę sieci bezprzeowodowej WIFI. Dodatkowym atutem będzie komunikacja z internetem poprzez sieć GSM. Dzięki takiemu zestawowi technologii w jednym urządzeniu, będziemy mogli porównać estymowaną lokalizację na podstawie wykrytych sieci bezprzewodowych, z lokalizacją zmierzoną przez odbiornik GPS.
+Podstawowym urządzeniem, które będzie częścią tej pracy będzie Smartfon. Ze względu na posiadany na pokładzie odbiornik GPS oraz kartę sieci bezprzewodowej WIFI. Dodatkowym atutem będzie komunikacja z internetem poprzez sieć GSM. Dzięki takiemu zestawowi technologii w jednym urządzeniu, będziemy mogli porównać estymowaną lokalizację na podstawie wykrytych sieci bezprzewodowych, z lokalizacją zmierzoną przez odbiornik GPS. Na to urządzenie powstanie aplikacja mobilna, w której na mapie porównamy skuteczność szacowania lokalizacji na podstawie sieci bezprzewodowych, do lokalizacji opartej na technologii GPS. Dodatkowo aplikacja ta będzie umożliwiała aktualizację lokalizacji sieci bezprzewodowych na podstawie sygnału GPS, aby baza danych lokalizacji sieci WIFI była jeszcze dokładniejsza.
+
+Drugim filarem pracy będzie aplikacja internetowa, w której będzie zaimplementowane szacowanie lokalizacji na podstawie sieci bezprzewodowych w zasięgu komputera. Implementacja geolokalizacji będzie zgodna ze specyfikacją interfejsu programistycznego Google Maps, ale tylko w ramach technologii bezprzewodowych sieci WIFI. Zgodność ze specyfikacją pozwoli na wykorzystanie tej aplika 
+
 
 %TODO opisanie dlaczego aplikacja internetowa jest wymagana - rozmiar publicznych danych, możliwość dalszego rozwoju dla LocationProvider'ów i geolokacji przeglądarek internetowych
 
@@ -11,18 +71,58 @@ Podstawowym urządzeniem, które będzie częścią tej pracy będzie Smartfon. 
 
  Publiczne zbiory z zapisanymi lokalizacjami sieci bezprzewodowych mają rozmiary, które przekraczają rozsądne dla urządzeń mobilnych możliwości obliczeniowe.
 
+\section{Aplikacja mobilna}
+\subsection{Android}
+% uprawnienia
+\subsection{XML}
+% widoki w androidzie oraz masa innych ustawien
+\subsection{Java}
+\subsection{SQLite}
+% baza danych + orm (activeandroid)
 
 \section{Aplikacja internetowa}
-Na potrzeby tej pracy
+%TODO
+% ??? Miejsce zapisu zebranych danych, import dużych danych, wizualizacja, analiza, zapytania na bazie
 
-\section{Estymacja lokalizacji na podstawie sieci Wifi}
-W przypadku algorytmu estymującego lokalizację użytkownika na podstawie zarejestrowanych sieci bezprzewodowych musimy rozważyć wiele czynników takich jak:
+\subsection{Ruby}
+Ruby jest obiektowo-funkcyjnym językiem.
+% inspirowany haskelem i innymi
+% posiada wiele implementacji
+% 6 najpopularniejszy język na podstawie http://githut.info/
+% 12 najpopularniejszy w tutorialach http://pypl.github.io/PYPL.html
+% pierwszy w latach 2008-2012 a potem 3cie miejsce
+% https://github.com/blog/2047-language-trends-on-github
+% 4-ty w https://www.techworm.net/2016/09/top-10-popular-programming-languages-github.html
+% powstal w japonii
+% w 1992 roku
 
-- zmienność lokalizacji urządzeń - duży dostawcy usług jak firma Orange czy UPC, nierzadko się zdarza, że sprawne Routery w funkcją WIFI przydzielają z powrotem do innych klientów.
-%zdjęcie orange funbox
 
-- mobilne hotspoty - smartfony mają możliwość tworzenia Punktów Dostępu dla innych urządzeń. Są też dedykowane rozwiązania takie jak MIFI
-% zdjęcie mifi?
+\subsubsection{Ruby on Rails}
+Ruby on Rails jest frameworkiem %czym po polsku?
+do tworzenia aplikacji internetowych zgodnie ze wzrocem architektonicznym Model-Widok-Kontroller (MVC) oraz z paradygmatem projektowym (z ang. design paradigm) Konwencja-Ponad-Konfiguracją (z ang. Convention-Over-Configuration). Złączenie tych dwóch ideii stworzyło jedną z najbardziej produktywnych środowisk do wytwarzania aplikacji internetowych.
 
-- migracja ludności - na własnym przykładzie mogę powiedzieć, że od 3 lat mam ten sam Punkt Dostępu, a w od kiedy go zakupiłem, przeprowadziłem się już 2 razy. Wielokrotnie miałem sytuacje, w których estymowana lokalizacja z Google, pokazywała okolice mojego poprzedniego zamieszkania.
-% zdjęcie routera ASUS?
+Połączenie dużej refleksyjności Rubiego, świetnej biblioteki ORM, czysta i zorganizowana struktura plików, która dzięki konwencji jest zawsze taka sama.
+
+% na bazie statystyki: https://trends.builtwith.com/framework/Ruby-on-Rails
+
+\subsection{HTTP}
+\subsection{HTML}
+Aplikacje internetowe nie istniałaby bez języka HTML. Ten już dość przestarzały język był wielokrotnie poprawiany i rozwijany na przestrzeni lat. Ale wciąż istnieje i nowoczesna jego odmiana w większości jest kompatybilna z poprzednimi wersjami. Najnowszą 
+\subsection{JavaScript}
+Ze wzgledu na ograniczenia interaktywności dokumentów HTML w pracy zostanie wykorzystany język JavaScript. W nowoczesnych aplikacjach internetowych jest to absolutnie normalne, że wykorzystuje się JavaScript do poprawienia User Experience
+%coś o node.js
+Język obecnie przeżywa drugie narodziny ze wzgledu na wytworzoną przez Google interpreter V8, który umożliwia uruchomienie JavaScriptu bez przeglądarki. Takie usamodzielnienie języka spowodowało wielki wybuch narzędzi konsolowych napisnych w JS. Wielu nowych bibliotek oraz frameworków. Stał się nowoczesną technologią do wytwarzania aplikacji internetowych ze wzgledu na mozliwosc pisania kodu raz: na frontend i backend. %(naukowe opisanie, przyklad: meteor)
+
+% backend vs frontend
+
+\subsubsection{JSON}
+Zrodził się na podstawie Javascriptu, ulubieniec nowoczesnych projektów.
+% schema-less
+\subsubsection{GeoJSON}
+\subsubsection{Coffee-Script}
+\subsection{CSS}
+\subsubsection{SCSS}
+\subsection{PostgreSQL}
+
+\section{Teza}
+A więc 
