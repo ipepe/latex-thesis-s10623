@@ -1,2 +1,52 @@
 \chapter{Część praktyczna}
-W rozdziale tym przedstawię proces utworzenia aplikacji internetowej oraz mobilnej. Omówię wyzwania oraz problemy, z którymi się spotkałem podczas implementacji. Na koniec przeprowadzę badania i wyciągnę wnioski które skonfrontuje z postawioną tezą.
+W rozdziale tym przedstawię proces utworzenia aplikacji internetowej oraz mobilnej. Omówię wyzwania oraz problemy, z którymi się spotkałem podczas implementacji. Opiszę też zasadę działania algorytmów potrzebnych do realizacji podstawowych założeń aplikacji mobilnej oraz internetowej. Na koniec przeprowadzę badania i wyciągnę wnioski które skonfrontuje z postawioną tezą.
+
+\section{Przygotowanie}
+Aby rozpocząć prace nad utworzeniem aplikacji internetowej i mobilnej potrzebny jest warsztat sprzętowy oraz odpowiedniego oprogramowania zainstalowanego i skonfigurowanego na danym sprzęcie.
+
+\subsection{Sprzęt}
+Do wytworzenia aplikacji internetowej oraz mobilnej potrzebny jest komputer. W moim przypadku środowisko programistyczne zainstalowałem i skonfigurowałem na MacBooku Pro z 2011 roku. Do celów badawczych pracy potrzebny mi był smartfon z systemem operacyjnym Android. Wykorzystałem do tego zadania LG Nexus 5. Dodatkowo jeżeli mamy smartfon z systemem Android to nie musimy konfigurować emulatora, co w przypadku mojego komputera mogłoby bardzo ograniczyć zasoby pamięci RAM.
+
+\subsection{Oprogramowanie}
+\subsubsection{Git}
+Korzystając z nowoczesnych narzędzi wytwarzania oprogramowania naturalnym jest, aby korzystać z systemu kontroli wersji. Osobiście mam doświadczenie z systemem Git. Aby korzystać z takiego systemu potrzebujemy mieć zainstalowane narzędzie klienckie. Ponadto potrzebujemy mieć skonfigurowane repozytoria na odpowiednim serwerze. Ja do tego celu wykorzystałem darmowy plan na platformie Github. Utworzyłem dwa repozytoria, oddzielne dla aplikacji internetowej i aplikacji mobilnej.
+
+\subsubsection{Ruby}
+Spośród wielu implementacji oraz narzędzi do zarządzania środowiskiem uruchomieniowym Ruby wybrałem wersję 2.3.3, która na dzień tworzenia projektu była najnowsza. Do zarządzania wersją Ruby wykorzystuję narzędzie rbenv. 
+
+\subsubsection{RubyMine}
+Mimo że Ruby jest językiem interpretowanym, a zestaw konsolowych narzędzi Ruby on Rails wykorzystuje się w sposób naturalny. Jednak osobiście bardzo lubię korzystać z tego edytora. Podświetlanie składni, refaktoryzacja kodu i integracja z Gitem powodują, że pisanie aplikacji internetowej nie jest toporne i żmudne.
+
+\subsubsection{PostgreSQL}
+PostgreSQL na środowiska Mac OS można ściągnąć w postaci zwykłej aplikacji systemowej i tak też zrobiłem w swoim projekcie. Aplikacja zasugerowała najnowszą wersję systemu bazy danych i na dzień utworzenia projektu oznaczenie wersji to 9.6
+
+\subsection{Android Studio}
+Najprostszym sposobem wytwarzania oprogramowania dla systemów Android jest korzystanie z pakietu Android Studio. Najnowsza wersja na dzień utworzenia projektu to 2.3.2. W ramach instalacji tego środowiska programistycznego zostało zainstalowanych wiele bibliotek. Między innymi SDK Manager, w którym zainstalowałem SDK Platformy o oznaczeniu Android 7.1.1 (Nougat), której poziom API to 25.
+
+\subsection{Przeglądarka internetowa}
+Gdy mowa o aplikacji internetowej, to nie można zapomnieć o jej kliencie - przeglądarce internetowej. Przy rozwoju aplikacji opartej na Ruby on Rails, nie ma większego znaczenia z jakiej przeglądarki skorzystamy. Osobiście jednak polecam aby na komputerze posiadać przeglądarki kilku firm, ze względu na kompatybilność. Jak się dowiemy w późniejszych rozdziałach, ma to znaczenie przy rozwoju takiej aplikacji internetowej.
+
+\section{Aplikacja internetowa}
+
+\subsection{Struktura danych}
+W internecie można znaleźć
+
+\subsection{Algorytm geolokalizacji}
+Podstawą algorytmu jest średnia ważona współrzędnych geograficznych najdokładniejszej pozycji sieci bezprzewodowych znalezionych na podstawie adresów MAC, a gdzie waga będzie wyliczana na podstawie: 
+
+\begin{itemize}
+\item daty ostatniej obserwacji
+\item podanej siły sygnału
+\item nieliniowego współczynnika odchylenia lokalizacji od innych lokalizacji sieci bezprzewodowych - jego zadaniem jest eliminacja lub ograniczenie znaczenia sieci, których lokalizacja w bazie danych może być nieaktualna
+\end{itemize}
+
+
+\subsection{Kontrolka mapy}
+Ze względu na ogrom danych jakim są zapisane lokalizacje sieci bezprzewodowych, potrzebne jest wykorzystanie mechanizmu AJAX. 
+
+\section{Aplikacja mobilna}
+\subsection{Baza danych}
+% denormalizowana
+% wykorzystująca ORM ActiveAndroid
+\subsection{Mapa}
+% trzeba było włączyć CORS

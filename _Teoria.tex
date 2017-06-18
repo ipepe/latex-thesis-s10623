@@ -1,18 +1,78 @@
 \chapter{Część teoretyczna}
 
-W tym rozdziale zostaną przedstawione technologie, proces projektowania aplikacji internetowej oraz aplikacji mobilnej, odwołam się do teorii na podstawie których zostaną zaimplementowane algorytmy w obydwu aplikacjach. Na koniec postawię tezę, którą sprawdzę w Części praktycznej tej pracy.
+W tym rozdziale zostaną przedstawione technologie, proces projektowania aplikacji internetowej oraz aplikacji mobilnej, odwołam się do teorii, na których podstawie zostaną zaimplementowane algorytmy w obydwu aplikacjach. Na koniec postawię tezę, którą zweryfikuję w części praktycznej.
 
 \section{Sieć bezprzewodowa}
-To rozwiązanie technologiczne, które przy użyciu fal elektromagnetycznych (promieniowanie radiowe) przesyła informacje między urządzeniami. Najczęściej spotykaną konfiguracją jest układ gwiazdy - jedna stacja bazowa i wiele klientów. 
+To rozwiązanie technologiczne, które przy użyciu fal elektromagnetycznych (promieniowanie radiowe) umożliwia komunikację między urządzeniami. Dzięki takiemu rozwiązaniu, możliwe jest tworzenie lokalnych sieci komputerowych bez kosztownego prowadzenia przewodów w ścianach czy podłogach. Technologia bezprzewodowych sieci komputerowych jest opisana przez IEEE 802.11™ - zestaw specyfikacji dla MAC oraz warsty fizycznej (PHY). Specyfikacja dopuszcza częstotliwości takie jak 900 MHz oraz 2.4, 3.6, 5 i 60 GHz.\ref{table:radio}
 
-Stacją bazową, bądź też punktem dostępu (z ang. access point) nazywamy urządzenie, które pracuje w trybie \textit{Infrastructure}. Urządzenia te, rozgłaszają swoją obecność na kanale wybranym przez administratora. %TODO więcej o rozgłaszaniu i wyszukiwaniu
+Stacją bazową, bądź też punktem dostępu (z ang. access point) nazywamy urządzenie, które pracuje w trybie \textit{Infrastructure}. Urządzenia te, operują na kanale wybranym przez jego administratora. Aby można było się podłączyć do stacji bazowej, korzysta ona ze specjalnych pakietów typu \textit{Beacon frame} do rozgłaszania parametrów sieci bezprzewodowej. W takim pakiecie znajdują się informacje między innymi o:
+\begin{itemize}
+    \item Sposobie szyfrowania sieci
+    \item Nazwie sieci (SSID)
+    \item Możliwych prędkościach komunikacji ze stacją
+\end{itemize}
 
-%fale decymetrowe 	VKF 	300-3000 MHz 	1000-100 mm 	Ultra high frequency 	UHF 	mikrofale
-%fale centymetrowe 		3-30 GHz 	100-10 mm 	Super high frequency 	SHF
+Możliwe jest \textit{ukrycie} sieci bezprzewodowej poprzez wyłączenie rozgłaszania sieci. Aby połączyć się z taką siecią trzeba podać jej nazwę (SSID) oraz hasło (jeżeli dana sieć używa szyfrowania).
+
+Najczęściej spotykaną konfiguracją sieci jest układ gwiazdy - jedna stacja bazowa i wiele klientów - który możemy spotkać w większości polskich domów oraz w małych firmach. 
+
+Specyfikacja IEEE 802.11 opisuje również czym są kanały w sieciach bezprzewodowych. Kanałami nazywamy częstotliwości, na których mogą operować bezprzewodowe karty sieciowe. Dla częstotliwości 2.4GHz tych kanałów jest 14 i są one równo rozmieszczone co 5 MHz zaczynając od 2412 MHz dla kanału 1 i kończąc na 2472 MHz dla kanału 13. Możemy jeszcze wyróżnić kanał 14 który jest dostępny tylko w Japonii i tylko dla specyfikacji opisanej w IEEE 802.11b. Dodatkowo kanały 12 i 13 są niedostępne w Ameryce Południowej. Warto jednak zauważyć, że do transmisji danych potrzebne jest pasmo o szerokości 20MHz dla 802.11g/n lub 40MHz dla 802.11n.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=8cm]{images/wifi_channels}
+  \caption{Graficzna reprezentacja rozmieszczenia kanałów sieci bezprzewodowych w paśmie 2.4GHz}
+  \label{fig:wifiChannels}
+\end{figure}
+
+Jak wcześniej wspomniałem technologia sieci bezprzewodowych korzysta z promieniowania radiowego - w częstotliwości określanej jako mikrofale:\cite{FaleRadioweWiki}
+
+\begin{table}
+\caption{Podział pasma radiowego}
+\label{table:radio}
+\begin{tabular}{ |p{3cm}|p{1cm}|p{2cm}|p{2cm}|p{2.5cm}|p{1.5cm}|  }
+ \hline
+Nazwa fal	& Skrót	& Częstotliwość	& Długość	& Nazwa angielska	& Skrót z ang. \\
+\hline
+\hline
+& & 3-30 Hz   & 100 tys.-10 tys. km	& Extremely low frequency	& ELF\\
+\hline
+& & 30-300 Hz & 10 tys.-1 tys. km	& Super low frequency	    & SLF\\
+ \hline
+& & 300-3000 Hz & 1000-100 km       & Ultra low frequency	    & ULF\\
+ \hline
+fale myriametrowe, fale bardzo długie & &	3-30 kHz & 100-10 km & Very low frequency  & VLF\\
+\hline
+fale kilometrowe, fale długie	& Dł, DF, D & 30-300 kHz & 10-1 km & Low frequency     & LF\\
+\hline
+fale hektometrowe, fale średnie & Śr, ŚF, Ś & 300-3000 kHz & 1000-100 m  & Medium frequency & MF\\
+\hline
+fale dekametrowe, fale krótkie  & KF, KR, K	& 3-30 MHz     & 100-10 m    & High frequency           & HF\\
+\hline
+fale metrowe, fale ultrakrótkie	& UKF	    & 30-300 MHz   & 10-1 m      & Very high frequency      & VHF\\
+\hline
+\multicolumn{6}{|c|}{mikrofale} \\
+\hline
+fale decymetrowe	            & VKF       & \textbf{300-3000 MHz} & 1000-100 mm & Ultra high frequency	    & UHF\\
+\hline
+fale centymetrowe		        &           & \textbf{3-30 GHz}	   & 100-10 mm	 & Super high frequency	    & SHF\\
+\hline
+fale milimetrowe		        &           & \textbf{30-300 GHz}   & 10-1 mm	 & Extremely high frequency	& EHF\\
+\hline
+fale submilimetrowe (fale terahercowe, promieniowanie terahercowe) & & 300-3000 GHz & 1000-100 $\mu$m & Tremendously high frequency & THF\\
+ \hline
+\end{tabular}
+\end{table}
+
+\textit{W zależności od długości fali radiowej jej propagacja zależy od różnorodnych zjawisk falowych np. dyfrakcji, refrakcji, odbicia, załamania, przenikanie np. od jonosfery itp.}\cite{FaleRadioweWiki}
+
+
+
+%Coraz częściej możemy się spotkać z kilkoma sieciami bezprzewodowymi operowanymi przez jedno urządzenie. Takie urządzenia mogą tworzyć sieci w dwóch różnych częstotliwościach (
+
+
 % WLAN vs WIFI
-% O standardzie 802.11
 % moc nie większa niż 500mW
-% o kanałach
 % o cechach fal elektromagnetycznych
 % - odbicia, załamania, przenikanie
 % obrazek z symulacją rozchodzenia się fal elektromagnetycznych
@@ -21,108 +81,164 @@ Stacją bazową, bądź też punktem dostępu (z ang. access point) nazywamy urz
 \section{Geolokalizacja}
 W Słowniku Języka Polskiego możemy przeczytać, że to \textit{ustalenie pozycji geograficznej lub adresu jakiegoś miejsca lub osoby poprzez wykorzystanie GPS lub adresu IP}\cite{GeolokalizacjaSJP}. Jednakże ta definicja dla mojej pracy dyplomowej, jest niepełna. Szukając dodatkowych informacji, zwróciłem się w stronę bardziej popularnego źródła - Wikipedii - i znalazłem rozwinięcie tego konceptu poprzez opisane tam \textit{Sposoby wyznaczania pozycji} w których to znajduje się podpunkt \textit{Pozycjonowanie względne – na podstawie widoczności innych obiektów o znanej pozycji (np. stacji bazowych przez komórkę czy ruterów Wi-Fi przez urządzenie). Ten sposób jest szczególnie istotny, jeśli urządzenie nie ma włączonego odbiornika GPS (oszczędność energii) lub w ogóle go nie posiada (np. laptop).}\cite{GeolokalizacjaWiki}. Ten podpunkt prawie idealnie opisuje koncept geolokalizacji na potrzeby tej pracy. 
 
-Brakuje tylko jednego szczegółu - geolokalizacja jest obarczona takim parametrem jak dokładność. Niezależenie od sposobu, w jaki określamy pozycję lokalizowanego urządzenia, to lokalizowanie zawsze jest na jakimś poziomie dokładności. Na podstawie wniosków z badań Dr. Zandbergen-a z 2011 roku, możemy przyjąć dokładność odbiornika GPS zamontowanego w smartfonie z systemem operacyjnym Android na poziomie od 5 do 8 metrów.\cite{GpsAccurancyZandbergen} W przy dokładności geolokalizacji, warto wspomnieć, że ważnym jest zastosowanie. 
+Brakuje tylko jednego szczegółu - geolokalizacja jest obarczona takim parametrem jak dokładność. Niezależenie od sposobu, w jaki określamy pozycję lokalizowanego urządzenia, to lokalizowanie zawsze jest na jakimś poziomie dokładności. Na podstawie wniosków z badań Dr. Zandbergen-a z 2011 roku, możemy przyjąć dokładność odbiornika GPS zamontowanego w smartfonie z systemem operacyjnym Android na poziomie od 5 do 8 metrów.\cite{GpsAccurancyZandbergen}
 
-Nie wszystkie potrzeby geolokalizowania wymagają dokładności na wysokim poziomie. Niektóre aplikacje potrzebują informacji jedynie o kraju lub mieście danego urządzenia - użytkownika. Inne potrzebują bardzo dokładnej informacji - w przypadku nawigowania w pomieszczeniach budynków.%tutaj można wspomnieć o projekcie Indoorway
+Przy dokładności geolokalizacji, warto wspomnieć, że ważnym jest jej zastosowanie. Nie wszystkie potrzeby geolokalizowania wymagają dokładności na wysokim poziomie. Niektóre aplikacje potrzebują informacji jedynie o kraju lub mieście danego urządzenia - użytkownika. Inne potrzebują bardzo dokładnej informacji - w przypadku nawigowania w pomieszczeniach budynków. np. muzea, targi expo. %tutaj można wspomnieć o projekcie Indoorway
 
 % opisać, że geolokalizacja, jest umieszczona na linii w czasie. Więc poruszające się urządzenie, musi odświeżać swoją lokalizację z określoną częstotliwością. optymalnie byłoby to średnia prędkość w stosunku do dokładności.
 
+% w trybie continous można podawać id poprzednio wyliczonej lokalizacji
+
 \subsection{Geografia}
-%TODO
-% o wspolrzednych geograficznych
-% o wyliczaniu odleglosci
-% o wyliczaniu powierzchni
-% o wyliczaniu zageszczenia sieci Wifi
+%http://fiddle.jshell.net/jk0uumn0/10/
+Przykładem dla tej pracy jest miasto Warszawa. Na potrzeby późniejszych rozdziałów, przyjąłem jako punkt centralny Warszawy z Wikipedii\cite{WarszawaWiki} jako współrzędne geograficzne w formacie DM S (Stopnie:Minuty:Sekundy) - 52\degree 13\textit{'} 56\textit{"} N, 21\degree 0\textit{'} 30\textit{"} E - lub odpowiadające im w formacie DM F (Stopnie Setne zwane miaro miernymi) \textbf{52.232222, 21.008333}. Wypada on na środku Placu Defilad, od wschodniej strony Pałacu Kultury.\ref{fig:warsawCenter}
 
-\subsection{Warunki miejskie}
-Przykładem dla tej pracy jest miasto - stolica - Warszawa. 
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=10cm]{images/warsaw-center}
+  \caption{Prezentacja punktu o współrzędnych 52.232222, 21.008333 - centrum Warszawy - na mapie}
+  \label{fig:warsawCenter}
+\end{figure}
 
-\subsection{Geolokalizacja na podstawie sieci bezprzewodowych}
+
+Za obszar do obliczenia powierzchni Warszawy przyjąłem koło o podanym wcześniej punkcie centralnym i promieniu obliczonym na podstawie powierzchni Warszawy\cite{WarszawaWiki}. Takie obliczenia powinny być wykonywane na przybliżonym kształcie Ziemi - elipsoidzie. Jednak ze względu na statystyczne przeznaczenie dokładności potrzebnych informacji, przyjmuję, że kształtem obszaru tych obliczeń jest płaszczyzna. Więc wzór wygląda następująco:
+\[ A=\pi*r^2 \]
+
+Gdzie A to powierzchnia Warszawy, a natomiast r to szukany promień okręgu. Po odpowiednim przekształceniu wzoru i późniejszym podstawieniu \textit{517,24 km\textsuperscript{2} (1.01.2016)}\cite{WarszawaWiki} pod symbol A, otrzymujemy promień - r - o wielkości 12,8313km.
+
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=10cm]{images/warsaw-10km-radius}
+  \caption{Prezentacja koła o promieniu 12,8313km o środku w punkcie o współrzędnych 52,232222, 21,008333 na mapie}
+  \label{fig:warsaw10kmRadius}
+\end{figure}
+
+\subsection{Statystyka}
+Chcąc szacować ilość sieci bezprzewodowych w Warszawie, trzeba zacząć od ludności w Warszawie. Na stronie internetowej Urzędu Statystycznego w Warszawie stan ludności w Warszawie wynosił 1 753 977 osób.(stan na dzień 31.12.2016) Dodatkowo w Warszawie funkcjonowało 424 195 przedsiębiorców. Posiłkując się informacją o przeciętnej liczbie osób w gospodarstwie domowym w województwie mazowieckim w kategorii miasta - wynosił 2,42.\cite{PrognozaGospodarstwGUS} Dzieląc ludność przez ilość przeciętnej ilości osób w gospodarstwie domowym, dostaniemy 724 784 gospodarstwa domowe w Warszawie. Na podstawie tych wartości możemy szacować że 395 350 (93,2\%)\cite{SpoleczenstoInformacyjneGUS} przedsiębiorców oraz 548 662 (75,7\%) gospodarstwa domowe, które posiadają łącza szerokopasmowe posiadają przynajmniej jedno urządzenie oferujące sieć bezprzewodową. Daje to końcowy szacunek w okolicach \textbf{944 012} punktów bezprzewodowego dostępu do internetu.
+
+\subsection{Na podstawie sieci bezprzewodowych}
 W przypadku algorytmu estymującego lokalizację użytkownika na podstawie zarejestrowanych sieci bezprzewodowych musimy rozważyć wiele czynników takich jak:
 
-- zmienność lokalizacji urządzeń - duży dostawcy usług jak firma Orange czy UPC, nierzadko się zdarza, że sprawne Routery w funkcją WIFI przydzielają z powrotem do innych klientów.
+\begin{itemize}
+    \item urządzenia wypożyczone konsumentom - dostawcy usług telekomunikacyjnych nierzadko przywracają sprawne urządzenia do kolejnego klienta bez zmiany identyfikatorów sprzętowych 
+    \item mobilne hotspoty - smartfony mają możliwość tworzenia punktów dostępu dla innych urządzeń. Są też dedykowane rozwiązania rozdawane do abonamentów przez operatorów telekomunikacyjnych, takie jak Huawei MIFI.
+    \item migracja ludności - na własnym przykładzie mogę powiedzieć, że od 3 lat mam ten sam Punkt Dostępu, a w od kiedy go zakupiłem, przeprowadziłem się już 2 razy. Wielokrotnie miałem sytuacje, w których estymowana lokalizacja z Google, pokazywała okolice mojego poprzedniego zamieszkania. Szczególnie przy drugiej przeprowadzce.
+\end{itemize}
 %zdjęcie orange funbox
-
-- mobilne hotspoty - smartfony mają możliwość tworzenia Punktów Dostępu dla innych urządzeń. Są też dedykowane rozwiązania rozdawane do abonamentów przez operatorów komórkowych, takie jak MIFI.
 % zdjęcie mifi?
-
-- migracja ludności - na własnym przykładzie mogę powiedzieć, że od 3 lat mam ten sam Punkt Dostępu, a w od kiedy go zakupiłem, przeprowadziłem się już 2 razy. Wielokrotnie miałem sytuacje, w których estymowana lokalizacja z Google, pokazywała okolice mojego poprzedniego zamieszkania.
 % zdjęcie routera ASUS?
 
-\section{Wytwarzanie oprogramowania}
-Podstawowymi metodologiami oraz zagadnieniami przy wytwarzaniu oprogramowania w nowoczesnych środowiskach są:
 
-\subsection{Wersjonowanie kodu źródłowego}
-\subsection{Użyteczność i ergonomia}
-% User Experience
-\subsection{ORM}
-\subsection{MVC}
+% wymagane zageszczenie zeby moc nawigowac z dokladnoscia X
 
+%\section{Projektowanie i planowanie}
+%Podstawowym urządzeniem, które będzie częścią tej pracy będzie Smartfon. Ze względu na posiadany na pokładzie odbiornik GPS oraz kartę sieci bezprzewodowej WIFI. Dodatkowym atutem będzie komunikacja z internetem poprzez sieć GSM. Dzięki takiemu zestawowi technologii w jednym urządzeniu, będziemy mogli porównać estymowaną lokalizację na podstawie wykrytych sieci bezprzewodowych, z lokalizacją zmierzoną przez odbiornik GPS. Na to urządzenie powstanie aplikacja mobilna, w której na mapie porównamy skuteczność szacowania lokalizacji na podstawie sieci bezprzewodowych, do lokalizacji opartej na technologii GPS. Dodatkowo aplikacja ta będzie umożliwiała aktualizację lokalizacji sieci bezprzewodowych na podstawie sygnału GPS, aby baza danych lokalizacji sieci WIFI była jeszcze dokładniejsza.
 
-\section{Projektowanie i planowanie}
-Podstawowym urządzeniem, które będzie częścią tej pracy będzie Smartfon. Ze względu na posiadany na pokładzie odbiornik GPS oraz kartę sieci bezprzewodowej WIFI. Dodatkowym atutem będzie komunikacja z internetem poprzez sieć GSM. Dzięki takiemu zestawowi technologii w jednym urządzeniu, będziemy mogli porównać estymowaną lokalizację na podstawie wykrytych sieci bezprzewodowych, z lokalizacją zmierzoną przez odbiornik GPS. Na to urządzenie powstanie aplikacja mobilna, w której na mapie porównamy skuteczność szacowania lokalizacji na podstawie sieci bezprzewodowych, do lokalizacji opartej na technologii GPS. Dodatkowo aplikacja ta będzie umożliwiała aktualizację lokalizacji sieci bezprzewodowych na podstawie sygnału GPS, aby baza danych lokalizacji sieci WIFI była jeszcze dokładniejsza.
-
-Drugim filarem pracy będzie aplikacja internetowa, w której będzie zaimplementowane szacowanie lokalizacji na podstawie sieci bezprzewodowych w zasięgu komputera. Implementacja geolokalizacji będzie zgodna ze specyfikacją interfejsu programistycznego Google Maps, ale tylko w ramach technologii bezprzewodowych sieci WIFI. Zgodność ze specyfikacją pozwoli na wykorzystanie tej aplika 
+%Drugim filarem części praktycznej będzie aplikacja internetowa, w której będzie zaimplementowane szacowanie lokalizacji na podstawie sieci bezprzewodowych w zasięgu komputera. Implementacja geolokalizacji będzie zgodna ze specyfikacją interfejsu programistycznego Google Maps, ale tylko w ramach technologii bezprzewodowych sieci WIFI. Zgodność ze specyfikacją pozwoli na wykorzystanie tej aplika 
 
 
 %TODO opisanie dlaczego aplikacja internetowa jest wymagana - rozmiar publicznych danych, możliwość dalszego rozwoju dla LocationProvider'ów i geolokacji przeglądarek internetowych
 
 %NOT-TODO: omówienie zależności nazw wifi do okolicznych firm/taksówek
 
- Publiczne zbiory z zapisanymi lokalizacjami sieci bezprzewodowych mają rozmiary, które przekraczają rozsądne dla urządzeń mobilnych możliwości obliczeniowe.
+%Publiczne zbiory z zapisanymi lokalizacjami sieci bezprzewodowych mają rozmiary, które przekraczają rozsądne dla urządzeń mobilnych możliwości obliczeniowe i przechowywania danych.
 
-\section{Aplikacja mobilna}
-\subsection{Android}
-% uprawnienia
-\subsection{XML}
-% widoki w androidzie oraz masa innych ustawien
-\subsection{Java}
-\subsection{SQLite}
-% baza danych + orm (activeandroid)
+%Dlatego więc powstaną dwie aplikacje - internetowa, która będzie zbiorem wszystkich informacji o sieciach bezprzewodowych w Warszawie oraz akompaniująca aplikacja mobilna, która będzie pełniła dwie role: zbieranie i przekazywanie informacji o sieciach bezprzewodowych do serwera, oraz prezentację algorytmów geolokalizujących na podstawie sieci bezprzewodowych wykrywanych poprzez urządzenie mobilne.
 
 \section{Aplikacja internetowa}
-%TODO
-% ??? Miejsce zapisu zebranych danych, import dużych danych, wizualizacja, analiza, zapytania na bazie
+Natomiast rolą aplikacji internetowej będzie geolokalizacja na podstawie podanych adresów MAC oraz siły sygnału widocznych sieci. Miejsce zapisu zebranych danych, import dużych danych, wizualizacja, analiza, zapytania na bazie
 
 \subsection{Ruby}
-Ruby jest obiektowo-funkcyjnym językiem.
-% inspirowany haskelem i innymi
-% posiada wiele implementacji
-% 6 najpopularniejszy język na podstawie http://githut.info/
-% 12 najpopularniejszy w tutorialach http://pypl.github.io/PYPL.html
-% pierwszy w latach 2008-2012 a potem 3cie miejsce
-% https://github.com/blog/2047-language-trends-on-github
-% 4-ty w https://www.techworm.net/2016/09/top-10-popular-programming-languages-github.html
-% powstal w japonii
-% w 1992 roku
+Ruby jest obiektowo-funkcyjnym interpretowanym językiem. Posiada zaimplementowane Odśmiecanie pamięci (z ang. Garbage Collector). \textit{Ruby bazuje na wielu językach, takich jak CLU, Eiffel, Lisp, Perl, Python czy Smalltalk. Składnia jest zorientowana liniowo i oparta na składni CLU oraz, w mniejszym stopniu, Perla.}\cite{RubyWiki}
 
+Ruby został stworzony przez Yukihiro Matsumoto w 1995 roku. Od tego czasu doczekał się wielu poprawek i optymalizacji. Jest to też jeden z niewielu języków, który posiada wiele interpreterówz pośród, których najbardziej popularnymi implementacjami obecnie są:
+\begin{itemize}
+    \item MRI (Matz's Ruby Interpreter) - jest wyjściową implementacją i jest de facto specyfikacją języka
+    \item JRuby - w większości napisany w Javie. osiągnął dosyć dużą popularność, ze względu na dobrą zgodność z oryginalną specyfikacją przy większej wydajności.
+    \item Ruboto - Nakładka na JRuby, która pozwala tworzyć aplikacje na Androida.
+    \item RBX (Rubinus) - Oparty na projekcie maszyny wirtualnej Smalltalk-80
+    \item RubyMotion - komercyjna implementacja na iOS, Mac OS X oraz Android
+\end{itemize}
+
+Wiele implementacji interpreterów. Przejrzysty i czytelny kod, który czyta się prawie jak naturalny język angielski. Spowodowały, że w latach 2008-2012 był najpopularniejszym językiem na GitHub.\cite{RubyStats2015} Niestety w kolejnych latach jego popularność spadała. W 2013 był drugi, w 2014 i 2015 był trzeci\cite{RubyStats2015}, w 2016 był już szósty i tak jest do dziś.\cite{GithutStats2017}
 
 \subsubsection{Ruby on Rails}
-Ruby on Rails jest frameworkiem %czym po polsku?
-do tworzenia aplikacji internetowych zgodnie ze wzrocem architektonicznym Model-Widok-Kontroller (MVC) oraz z paradygmatem projektowym (z ang. design paradigm) Konwencja-Ponad-Konfiguracją (z ang. Convention-Over-Configuration). Złączenie tych dwóch ideii stworzyło jedną z najbardziej produktywnych środowisk do wytwarzania aplikacji internetowych.
+Ruby on Rails jest zestawem bibliotek, które tworzą szkielet (z ang. framework) do budowania aplikacji  internetowych zgodnie ze wzorcem architektonicznym Model-Widok-Kontroler (MVC) oraz z paradygmatem projektowym (z ang. design paradigm) Konwencja-Ponad-Konfiguracją (z ang. Convention-Over-Configuration). Kolejną ideą jest \textit{Nie powtarzaj się} (z ang. Don't Repeat Yourself) - sednem tej idei jest modularyzacja i poprawna strukturyzacja kodu. Dzięki takiemu podejściu kod aplikacji jest łatwiej czytać, modyfikować i testować. 
 
-Połączenie dużej refleksyjności Rubiego, świetnej biblioteki ORM, czysta i zorganizowana struktura plików, która dzięki konwencji jest zawsze taka sama.
+%Warto jeszcze wspomnieć o standardach, które rządzą światem kontrolerów są to CRUD i REST. Pierwszy opisuje podstawowe operacje, które można wykonywać na 
 
-% na bazie statystyki: https://trends.builtwith.com/framework/Ruby-on-Rails
+Połączenie dużej refleksyjności Rubiego, świetnej biblioteki ORM, czystej i zorganizowanej struktury plików, która dzięki konwencji, w każdym projekcie jest zawsze taka sama stworzyło jedno z najbardziej lubianych i najlepiej ocenianych pod względem produktywności środowisk do wytwarzania aplikacji internetowych.
 
-\subsection{HTTP}
+Ze względu na bardzo kosztowną naturę powstawania aplikacji internetowych opartych na rozwiązaniu Ruby on Rails, popularność tej technologii w morzu internetu jest niszowa.\cite{TrendsBuiltWithRails}
+
+\begin{table}
+\caption{Użycie Ruby on Rails w internecie}
+\label{table:rubyusage}
+\begin{tabular}{ |l|l|l|  }
+\hline
+Kategoria & Liczba wykrytych z liczbą wszystkich & Procent \\
+\hline
+\hline
+Top 10 tyś na postawie Quantcast & 558 z 10 000 & 5.6\% \\
+\hline
+Top 100 tyś na postawie Quantcast & 3 415 z 100 000 & 3.4\% \\
+\hline
+Cała baza builtwith.com & 1,162,698 z 370,442,435 & 0.3\% \\
+\hline
+\end{tabular}
+\end{table}
+
+Jak widać z tabeli \ref{table:rubyusage} z tego rozwiązania korzystają aplikacje internetowe które są oceniane wysoko w rankingu Quantcast. Strony takie potrzebują wysokiej jakości dopasowanych do ich potrzeb rozwiązań. Oczywiście nie zaprzeczam, że można korzystać z Ruby on Rails przy prostych potrzebach takich jak blogi z systemami zarządzania treścią lub przy kampaniach promocyjnych czy stronach produktów. Jednakże koszt powstania takiej strony internetowej jest niepotrzebnie duży. Przy takich potrzebach na rynku rozwiązań dużo lepszym rozwiązaniem byłby Wordpress, Joomla lub inny system do zarządzania treścią. Rozwiązania oparte na PHP mają mniejszy koszt infrastruktury w porównaniu do Ruby on Rails. Wsparcie techniczne i specjaliści są tańsi i łatwiej osiągalni.
+
 \subsection{HTML}
-Aplikacje internetowe nie istniałaby bez języka HTML. Ten już dość przestarzały język był wielokrotnie poprawiany i rozwijany na przestrzeni lat. Ale wciąż istnieje i nowoczesna jego odmiana w większości jest kompatybilna z poprzednimi wersjami. Najnowszą 
-\subsection{JavaScript}
-Ze wzgledu na ograniczenia interaktywności dokumentów HTML w pracy zostanie wykorzystany język JavaScript. W nowoczesnych aplikacjach internetowych jest to absolutnie normalne, że wykorzystuje się JavaScript do poprawienia User Experience
-%coś o node.js
-Język obecnie przeżywa drugie narodziny ze wzgledu na wytworzoną przez Google interpreter V8, który umożliwia uruchomienie JavaScriptu bez przeglądarki. Takie usamodzielnienie języka spowodowało wielki wybuch narzędzi konsolowych napisnych w JS. Wielu nowych bibliotek oraz frameworków. Stał się nowoczesną technologią do wytwarzania aplikacji internetowych ze wzgledu na mozliwosc pisania kodu raz: na frontend i backend. %(naukowe opisanie, przyklad: meteor)
+Aplikacje internetowe nie istniałaby bez języka HTML. Ten już dość przestarzały język był wielokrotnie poprawiany i rozwijany na przestrzeni lat. Ale wciąż istnieje i nowoczesna jego odmiana w większości jest kompatybilna z poprzednimi wersjami.
 
-% backend vs frontend
+\subsection{JavaScript}
+Ze względu na ograniczenia interaktywności dokumentów HTML w pracy zostanie wykorzystany język JavaScript. W nowoczesnych aplikacjach internetowych jest to absolutnie normalne, że wykorzystuje się ten język do poprawienia użyteczności i ergonomiczności aplikacji. Pozwala tworzyć bardziej responsywne interfejsy użytkownika i wymieniać informacje z serwerem bez przeładowywania całej strony internetowej.
+
+Język obecnie przeżywa drugie narodziny ze względu na wytworzoną przez Google interpreter V8, który umożliwia uruchomienie JavaScriptu bez przeglądarki. Takie usamodzielnienie języka spowodowało wielki wybuch narzędzi konsolowych, wielu nowych bibliotek oraz szkieletów do budowania aplikacji (z ang. framework). Stał się nowoczesną technologią do wytwarzania aplikacji internetowych, ze względu na możliwość pisania kodu aplikacji po stronie przeglądarki i po stronie serwera w jednym języku. Pozwala to na mniejsze wymagania wobec programistów i tym samym powoduje lepszą znajomość języka.
+
+% gry, edytory 3d, geolokalizacja
+
+%\subsubsection{AJAX}
 
 \subsubsection{JSON}
-Zrodził się na podstawie Javascriptu, ulubieniec nowoczesnych projektów.
-% schema-less
-\subsubsection{GeoJSON}
-\subsubsection{Coffee-Script}
-\subsection{CSS}
-\subsubsection{SCSS}
+To struktura danych, która zrodziła się na podstawie JavaScriptu.\cite{JsonWiki} Stał się nieodłącznym elementem w komunikacjach z interfejsami programistycznymi aplikacji internetowych ze względu na większą czytelność w trakcie procesu rozwoju oprogramowania od rozwiązań takich jak XML czy HTML. Nie posiada zadeklarowanej struktury do przechowywania danych i między innymi dlatego tak często z niego się korzysta przy prostych komunikacjach typu AJAX. Implementacja generatorów oraz parserów do tego standardu znajduje się w większości języków programistycznych.
+
+%\subsubsection{GeoJSON}
+%Jest otwartym standardem opisującym proste geograficzne kształty. 
+
 \subsection{PostgreSQL}
+Źródłowo otwarty system zarządzania obiektowo-relacyjną bazą danych. Dla twórców ważną ideą jest zgodność ze standardami oraz możliwość rozszerzania funkcjonalności poprzez różne dodatki. Posiada implementacje na wszystkie najpopularniejsze systemy operacyjne takie jak Windows, Linux oraz Unix. Postgres (w skrócie od słowa PostgreSQL) dąży do pełnej zgodności ze standardem ACID.\cite{PostgresWiki}
+
+\section{Aplikacja mobilna}
+Rolą aplikacji mobilnej będzie odpytywanie aplikacji internetowej o lokalizację w oparciu i zbierane informacje. Dodatkowo aplikacja będzie umożliwiała obserwacje lokalizacji sieci bezprzewodowych i przesyłanie tych danych do aplikacji internetowej.
+
+\subsection{Android}
+Źródłowo otwarty system operacyjny tworzony przez Google oparty na Linux-owym jądrze. Zaprojektowany z myślą o urządzeniach mobilnych takich jak telefony i tablety. Głównymi narzędziami użytkownika są gesty na wyświetlaczu dotykowym ale mimo tego, system ma wsparcie dla klawiatur i myszek.\cite{AndroidWiki}
+
+\subsection{Java}
+Choć rdzeń systemu Android jest napisany w C++, to aplikacje i interfejs użytkownika jest napisany w Javie.\cite{AndroidWiki}
+
+Java jest jednym z najpopularniejszych języków programistycznych na świecie. Zależnie od różnych statystyk, ale wg. serwisu GitHut jest to \textbf{drugie miejsce na świecie.}\cite{GithutStats2017} Początkowym hasłem twórców tego języka było \textit{Napisz raz, uruchom wszędzie} (z ang. \textit{write once, run anywhere}). Jest silnie typowana, obiektowa i kompilowana do kodu bajtów dla maszyny wirtualnej.\cite{JavaWiki}
+
+\subsection{XML}
+Gdy Android powstawał, standard XML był nieodłączną częścią Javy. Naturalnym jest, że znalazł on miejsce jako pliki konfiguracyjne oraz pewnego rodzaju struktura dla widoków aplikacji systemu Android.
+
+Standard ten jest coraz częściej wypierany przez JSON ze względu na kiepską czytelność i dużą pracochłonność przy ręcznym tworzeniu i modyfikowaniu struktury danych ale mimo wszystko umiejętność pracy z XML jest nieodłącznym atrybutem programisty.
+
+\subsection{SQLite}
+Do tymczasowego przechowywania danych podczas zbierania informacji o lokalizacjach sieci bezprzewodowych ta plikowa baza danych jest rozwiązaniem pasującym tutaj idealnie. W wielu aplikacjach Android-owych jest to podstawowy wybór gdzie pojawiają się relacyjne dane, które trzeba przechować lub filtrować.
 
 \section{Teza}
-A więc 
+Na podstawie przeprowadzonej analizy moja teza składa się z trzech części, które definiują kryteria, dla których nawigacja w warunkach miejskich może być skuteczna. Tezę uznam za potwierdzoną gdy, spełnione zostaną wszystkich części w stopniu przynajmniej minimalnym.
+
+\subsection{Część pierwsza - precyzja geolokalizacji}
+Urządzenie z zainstalowaną aplikacją mobilną umożliwi precyzyjne określenie lokalizacji w warunkach miejskich. Poziom precyzji, który uważam za minimalny do skutecznej nawigacji pojazdu samochodowego przy prędkości nie przekraczającej 60km/h to 50 metry. Zmierzenie tej wartości zostanie wykonane przez porównanie pozycję z odbiornika GPS i porównanie z pozycją otrzymaną przez geolokalizację na podstawie sieci bezprzewodowych w zasięgu urządzenia.
+
+\subsection{Część druga - szybkość geolokalizacji}
+Urządzenie z zainstalowaną aplikacją mobilną umożliwi określenie lokalizacji z odpowiednią szybkością w warunkach miejskich. Szybkość geolokalizacji, którą uważam za minimalny do skutecznej nawigacji pojazdu samochodowego przy prędkości nie przekraczającej 60km/h to 5 sekund. Wartość ta będzie wynikać ze średniego czasu pomiędzy otrzymanymi wynikami geolokalizacji.
+
+\subsection{Część trzecia - zagęszczenie sieci bezprzewodowych na terenie Warszawy}
+Na terenie Warszawy zagęszczenie sieci bezprzewodowych powinno wynosić w okolicach 1 825 sztuk na kilometr kwadratowy. Taką wartość otrzymałem poprzez podzielenie \textbf{944 012} - szacowanej ilości sieci bezprzewodowych na terenie miasta Warszawa na podstawie statystycznych informacji o ludności, gospodarstwach domowych oraz informacji o dostępnie do internetu społeczeństwa - przez \textbf{517,24 km\textsuperscript{2}} - pole powierzchni miasta Warszawa. Oczywiście wartość ta będzie się różnić ze względu na różnorodność zabudowy Warszawy. Jednakże nie może być mniejsza niż 400 sztuk na kilometr kwadratowy, bo oznaczałoby to dokładność geolokalizacji na poziomie 50 metrów.
