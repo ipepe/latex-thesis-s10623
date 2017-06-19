@@ -34,19 +34,6 @@ Coś o dockerze(ngnix proxy). Coś o azure. Dlaczego Cloudflare?
 
 % może jakieś screenshoty z panelu azure?
 
-\section{Implementacja}
-
-Implementację rozpocząłem od importu istniejących danych o lokalizacjach sieci wifi z różnych serwisów.
-
-\subsection{Istniejące dane}
-
-Cztery serwisy udostępniają dumpy bazy, ich nazwy razem z rozmiarem spakowanych danych które udostępniają:
- - openwifi.su (openwlanmap.org) - 245,7MB - CSV spakowany do tar.bz2
- - radiocells.org (openbmap) - 1.6GB - baza danych sqlite
- - mylnikov.org - 657 MB - CSV spakowany do zip
-
-\subsection{Import danych i denormalizacja}
-Ze względu na prędkość importu zdecydowałem się zdenormalizować w tabeli obserwacji punktów dostępów, kolumnę BSSID - opisującą adres sprzętowy urządzenia. Dzięki temu mogłem użyć biblioteki activerecord-import. Która pozwala na import danych do bazy danych poprzez bardzo przyjemny interfejs.
 
 \subsubsection{Dane z mylnikov.org}
 

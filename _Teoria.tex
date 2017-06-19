@@ -3,20 +3,18 @@
 W tym rozdziale zostaną przedstawione technologie, proces projektowania aplikacji internetowej oraz aplikacji mobilnej, odwołam się do teorii, na których podstawie zostaną zaimplementowane algorytmy w obydwu aplikacjach. Na koniec postawię tezę, którą zweryfikuję w części praktycznej.
 
 \section{Sieć bezprzewodowa}
-To rozwiązanie technologiczne, które przy użyciu fal elektromagnetycznych (promieniowanie radiowe) umożliwia komunikację między urządzeniami. Dzięki takiemu rozwiązaniu, możliwe jest tworzenie lokalnych sieci komputerowych bez kosztownego prowadzenia przewodów w ścianach czy podłogach. Technologia bezprzewodowych sieci komputerowych jest opisana przez IEEE 802.11™ - zestaw specyfikacji dla MAC oraz warsty fizycznej (PHY). Specyfikacja dopuszcza częstotliwości takie jak 900 MHz oraz 2.4, 3.6, 5 i 60 GHz.\ref{table:radio}
+To rozwiązanie technologiczne, które przy użyciu fal elektromagnetycznych (promieniowanie radiowe) umożliwia komunikację między urządzeniami. Dzięki takiemu rozwiązaniu możliwe jest tworzenie lokalnych sieci komputerowych bez kosztownego prowadzenia przewodów w ścianach czy podłogach. Technologia bezprzewodowych sieci komputerowych jest opisana przez IEEE 802.11™ - zestaw specyfikacji dla MAC oraz warstwy fizycznej (PHY). Specyfikacja dopuszcza częstotliwości takie jak 900 MHz oraz 2.4, 3.6, 5 i 60 GHz. Tablica \ref{table:radio}
 
-Stacją bazową, bądź też punktem dostępu (z ang. access point) nazywamy urządzenie, które pracuje w trybie \textit{Infrastructure}. Urządzenia te, operują na kanale wybranym przez jego administratora. Aby można było się podłączyć do stacji bazowej, korzysta ona ze specjalnych pakietów typu \textit{Beacon frame} do rozgłaszania parametrów sieci bezprzewodowej. W takim pakiecie znajdują się informacje między innymi o:
+Stacją bazową bądź też punktem dostępu (z ang. access point) nazywamy urządzenie, które pracuje w trybie \textit{Infrastructure}. Urządzenia te, operują na kanale wybranym przez jego administratora. Aby można było się podłączyć do stacji bazowej, korzysta ona ze specjalnych pakietów typu \textit{Beacon frame} do rozgłaszania parametrów sieci bezprzewodowej. W takim pakiecie znajdują się informacje między innymi o:
 \begin{itemize}
     \item Sposobie szyfrowania sieci
     \item Nazwie sieci (SSID)
     \item Możliwych prędkościach komunikacji ze stacją
 \end{itemize}
 
-Możliwe jest \textit{ukrycie} sieci bezprzewodowej poprzez wyłączenie rozgłaszania sieci. Aby połączyć się z taką siecią trzeba podać jej nazwę (SSID) oraz hasło (jeżeli dana sieć używa szyfrowania).
+Możliwe jest \textit{ukrycie} sieci bezprzewodowej poprzez wyłączenie rozgłaszania sieci. Aby połączyć się z taką siecią, trzeba podać jej nazwę (SSID) oraz hasło (jeżeli dana sieć używa szyfrowania).
 
 Najczęściej spotykaną konfiguracją sieci jest układ gwiazdy - jedna stacja bazowa i wiele klientów - który możemy spotkać w większości polskich domów oraz w małych firmach. 
-
-Specyfikacja IEEE 802.11 opisuje również czym są kanały w sieciach bezprzewodowych. Kanałami nazywamy częstotliwości, na których mogą operować bezprzewodowe karty sieciowe. Dla częstotliwości 2.4GHz tych kanałów jest 14 i są one równo rozmieszczone co 5 MHz zaczynając od 2412 MHz dla kanału 1 i kończąc na 2472 MHz dla kanału 13. Możemy jeszcze wyróżnić kanał 14 który jest dostępny tylko w Japonii i tylko dla specyfikacji opisanej w IEEE 802.11b. Dodatkowo kanały 12 i 13 są niedostępne w Ameryce Południowej. Warto jednak zauważyć, że do transmisji danych potrzebne jest pasmo o szerokości 20MHz dla 802.11g/n lub 40MHz dla 802.11n.
 
 \begin{figure}[h!]
   \centering
@@ -24,6 +22,8 @@ Specyfikacja IEEE 802.11 opisuje również czym są kanały w sieciach bezprzewo
   \caption{Graficzna reprezentacja rozmieszczenia kanałów sieci bezprzewodowych w paśmie 2.4GHz}
   \label{fig:wifiChannels}
 \end{figure}
+
+Specyfikacja IEEE 802.11 opisuje również czym są kanały w sieciach bezprzewodowych. Kanałami nazywamy częstotliwości, na których mogą operować bezprzewodowe karty sieciowe. Dla częstotliwości 2.4GHz tych kanałów jest 14 i są one równo rozmieszczone co 5 MHz, zaczynając od 2412 MHz dla kanału 1 i kończąc na 2472 MHz dla kanału 13. Możemy jeszcze wyróżnić kanał 14, który jest dostępny tylko w Japonii i tylko dla specyfikacji opisanej w IEEE 802.11b. Znajduje się on na częstotliwości 2484 MHz. Dodatkowo kanały 12 i 13 są niedostępne w Ameryce Południowej. Warto jednak zauważyć, że do transmisji danych potrzebne jest pasmo o szerokości 20MHz dla 802.11g/n lub 40MHz dla 802.11n co powoduje znaczne zmniejszenie ilości dostępnych kanałów jeżeli nie chcemy mieć zakłóceń wynikających z pracy innej sieci bezprzewodowej na części pasma naszej częstotliwości.\cite{WifiChannelsWiki}
 
 Jak wcześniej wspomniałem technologia sieci bezprzewodowych korzysta z promieniowania radiowego - w częstotliwości określanej jako mikrofale:\cite{FaleRadioweWiki}
 
@@ -189,7 +189,7 @@ Cała baza builtwith.com & 1,162,698 z 370,442,435 & 0.3\% \\
 \end{tabular}
 \end{table}
 
-Jak widać z tabeli \ref{table:rubyusage} z tego rozwiązania korzystają aplikacje internetowe które są oceniane wysoko w rankingu Quantcast. Strony takie potrzebują wysokiej jakości dopasowanych do ich potrzeb rozwiązań. Oczywiście nie zaprzeczam, że można korzystać z Ruby on Rails przy prostych potrzebach takich jak blogi z systemami zarządzania treścią lub przy kampaniach promocyjnych czy stronach produktów. Jednakże koszt powstania takiej strony internetowej jest niepotrzebnie duży. Przy takich potrzebach na rynku rozwiązań dużo lepszym rozwiązaniem byłby Wordpress, Joomla lub inny system do zarządzania treścią. Rozwiązania oparte na PHP mają mniejszy koszt infrastruktury w porównaniu do Ruby on Rails. Wsparcie techniczne i specjaliści są tańsi i łatwiej osiągalni.
+Jak widać z Tablicy \ref{table:rubyusage} z tego rozwiązania korzystają aplikacje internetowe które są oceniane wysoko w rankingu Quantcast. Strony takie potrzebują wysokiej jakości dopasowanych do ich potrzeb rozwiązań. Oczywiście nie zaprzeczam, że można korzystać z Ruby on Rails przy prostych potrzebach takich jak blogi z systemami zarządzania treścią lub przy kampaniach promocyjnych czy stronach produktów. Jednakże koszt powstania takiej strony internetowej jest niepotrzebnie duży. Przy takich potrzebach na rynku rozwiązań dużo lepszym rozwiązaniem byłby Wordpress, Joomla lub inny system do zarządzania treścią. Rozwiązania oparte na PHP mają mniejszy koszt infrastruktury w porównaniu do Ruby on Rails. Wsparcie techniczne i specjaliści są tańsi i łatwiej osiągalni.
 
 \subsection{HTML}
 Aplikacje internetowe nie istniałaby bez języka HTML. Ten już dość przestarzały język był wielokrotnie poprawiany i rozwijany na przestrzeni lat. Ale wciąż istnieje i nowoczesna jego odmiana w większości jest kompatybilna z poprzednimi wersjami.
