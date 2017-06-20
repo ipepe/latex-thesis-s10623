@@ -1,0 +1,30 @@
+
+%Coraz częściej możemy się spotkać z kilkoma sieciami bezprzewodowymi operowanymi przez jedno urządzenie. Takie urządzenia mogą tworzyć sieci w dwóch różnych częstotliwościach (
+
+
+% WLAN vs WIFI
+% moc nie większa niż 500mW
+% o cechach fal elektromagnetycznych
+% - odbicia, załamania, przenikanie
+% obrazek z symulacją rozchodzenia się fal elektromagnetycznych
+% link do artykułu tego gościa co zrobił aplikację do symulowania odbić sygnału elektromagnetycznego
+
+% opisać, że geolokalizacja, jest umieszczona na linii w czasie. Więc poruszające się urządzenie, musi odświeżać swoją lokalizację z określoną częstotliwością. optymalnie byłoby to średnia prędkość w stosunku do dokładności.
+
+% w trybie continous można podawać id poprzednio wyliczonej lokalizacji
+
+% wymagane zageszczenie zeby moc nawigowac z dokladnoscia X
+
+%\section{Projektowanie i planowanie}
+%Podstawowym urządzeniem, które będzie częścią tej pracy będzie Smartfon. Ze względu na posiadany na pokładzie odbiornik GPS oraz kartę sieci bezprzewodowej WIFI. Dodatkowym atutem będzie komunikacja z internetem poprzez sieć GSM. Dzięki takiemu zestawowi technologii w jednym urządzeniu, będziemy mogli porównać estymowaną lokalizację na podstawie wykrytych sieci bezprzewodowych, z lokalizacją zmierzoną przez odbiornik GPS. Na to urządzenie powstanie aplikacja mobilna, w której na mapie porównamy skuteczność szacowania lokalizacji na podstawie sieci bezprzewodowych, do lokalizacji opartej na technologii GPS. Dodatkowo aplikacja ta będzie umożliwiała aktualizację lokalizacji sieci bezprzewodowych na podstawie sygnału GPS, aby baza danych lokalizacji sieci WIFI była jeszcze dokładniejsza.
+
+%Drugim filarem części praktycznej będzie aplikacja internetowa, w której będzie zaimplementowane szacowanie lokalizacji na podstawie sieci bezprzewodowych w zasięgu komputera. Implementacja geolokalizacji będzie zgodna ze specyfikacją interfejsu programistycznego Google Maps, ale tylko w ramach technologii bezprzewodowych sieci WIFI. Zgodność ze specyfikacją pozwoli na wykorzystanie tej aplika
+
+
+%TODO opisanie dlaczego aplikacja internetowa jest wymagana - rozmiar publicznych danych, możliwość dalszego rozwoju dla LocationProvider'ów i geolokacji przeglądarek internetowych
+
+%NOT-TODO: omówienie zależności nazw wifi do okolicznych firm/taksówek
+
+%Publiczne zbiory z zapisanymi lokalizacjami sieci bezprzewodowych mają rozmiary, które przekraczają rozsądne dla urządzeń mobilnych możliwości obliczeniowe i przechowywania danych.
+
+%Dlatego więc powstaną dwie aplikacje: internetowa, która będzie zbiorem wszystkich informacji o sieciach bezprzewodowych w Warszawie oraz akompaniująca aplikacja mobilna, która będzie pełniła dwie role: zbieranie i przekazywanie informacji o sieciach bezprzewodowych do serwera, oraz prezentację algorytmów geolokalizujących na podstawie sieci bezprzewodowych wykrywanych poprzez urządzenie mobilne.

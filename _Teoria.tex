@@ -14,7 +14,7 @@ Stacją bazową bądź też punktem dostępu (z ang. access point) nazywamy urz�
 
 Możliwe jest \textit{ukrycie} sieci bezprzewodowej poprzez wyłączenie rozgłaszania sieci. Aby połączyć się z taką siecią, trzeba podać jej nazwę (SSID) oraz hasło (jeżeli dana sieć używa szyfrowania).
 
-Najczęściej spotykaną konfiguracją sieci jest układ gwiazdy - jedna stacja bazowa i wiele klientów - który możemy spotkać w większości polskich domów oraz w małych firmach. 
+Najczęściej spotykaną konfiguracją sieci jest układ gwiazdy - jedna stacja bazowa i wiele klientów - który możemy spotkać w większości polskich domów oraz w małych firmach.
 
 \begin{figure}[h!]
   \centering
@@ -66,28 +66,14 @@ fale submilimetrowe (fale terahercowe, promieniowanie terahercowe) & & 300-3000 
 
 \textit{W zależności od długości fali radiowej jej propagacja zależy od różnorodnych zjawisk falowych np. dyfrakcji, refrakcji, odbicia, załamania, przenikanie np. od jonosfery itp.}\cite{FaleRadioweWiki}
 
-
-
-%Coraz częściej możemy się spotkać z kilkoma sieciami bezprzewodowymi operowanymi przez jedno urządzenie. Takie urządzenia mogą tworzyć sieci w dwóch różnych częstotliwościach (
-
-
-% WLAN vs WIFI
-% moc nie większa niż 500mW
-% o cechach fal elektromagnetycznych
-% - odbicia, załamania, przenikanie
-% obrazek z symulacją rozchodzenia się fal elektromagnetycznych
-% link do artykułu tego gościa co zrobił aplikację do symulowania odbić sygnału elektromagnetycznego
-
 \section{Geolokalizacja}
-W Słowniku Języka Polskiego możemy przeczytać, że to \textit{ustalenie pozycji geograficznej lub adresu jakiegoś miejsca lub osoby poprzez wykorzystanie GPS lub adresu IP}\cite{GeolokalizacjaSJP}. Jednakże ta definicja dla mojej pracy dyplomowej, jest niepełna. Szukając dodatkowych informacji, zwróciłem się w stronę bardziej popularnego źródła - Wikipedii - i znalazłem rozwinięcie tego konceptu poprzez opisane tam \textit{Sposoby wyznaczania pozycji} w których to znajduje się podpunkt \textit{Pozycjonowanie względne – na podstawie widoczności innych obiektów o znanej pozycji (np. stacji bazowych przez komórkę czy ruterów Wi-Fi przez urządzenie). Ten sposób jest szczególnie istotny, jeśli urządzenie nie ma włączonego odbiornika GPS (oszczędność energii) lub w ogóle go nie posiada (np. laptop).}\cite{GeolokalizacjaWiki}. Ten podpunkt prawie idealnie opisuje koncept geolokalizacji na potrzeby tej pracy. 
+W Słowniku Języka Polskiego możemy przeczytać, że to \textit{ustalenie pozycji geograficznej lub adresu jakiegoś miejsca lub osoby poprzez wykorzystanie GPS lub adresu IP}\cite{GeolokalizacjaSJP}. Jednakże ta definicja dla mojej pracy dyplomowej, jest niepełna. Szukając dodatkowych informacji, zwróciłem się w stronę bardziej popularnego źródła - Wikipedii - i znalazłem rozwinięcie tego konceptu poprzez opisane tam \textit{Sposoby wyznaczania pozycji} w których to znajduje się podpunkt \textit{Pozycjonowanie względne – na podstawie widoczności innych obiektów o znanej pozycji (np. stacji bazowych przez komórkę czy ruterów Wi-Fi przez urządzenie). Ten sposób jest szczególnie istotny, jeśli urządzenie nie ma włączonego odbiornika GPS (oszczędność energii) lub w ogóle go nie posiada (np. laptop).}\cite{GeolokalizacjaWiki}. Ten podpunkt prawie idealnie opisuje koncept geolokalizacji na potrzeby tej pracy.
 
 Brakuje tylko jednego szczegółu - geolokalizacja jest obarczona takim parametrem jak dokładność. Niezależenie od sposobu, w jaki określamy pozycję lokalizowanego urządzenia, to lokalizowanie zawsze jest na jakimś poziomie dokładności. Na podstawie wniosków z badań Dr. Zandbergen-a z 2011 roku, możemy przyjąć dokładność odbiornika GPS zamontowanego w smartfonie z systemem operacyjnym Android na poziomie od 5 do 8 metrów.\cite{GpsAccurancyZandbergen}
 
 Przy dokładności geolokalizacji, warto wspomnieć, że ważnym jest jej zastosowanie. Nie wszystkie potrzeby geolokalizowania wymagają dokładności na wysokim poziomie. Niektóre aplikacje potrzebują informacji jedynie o kraju lub mieście danego urządzenia - użytkownika. Inne potrzebują bardzo dokładnej informacji - w przypadku nawigowania w pomieszczeniach budynków. np. muzea, targi expo. %tutaj można wspomnieć o projekcie Indoorway
 
-% opisać, że geolokalizacja, jest umieszczona na linii w czasie. Więc poruszające się urządzenie, musi odświeżać swoją lokalizację z określoną częstotliwością. optymalnie byłoby to średnia prędkość w stosunku do dokładności.
 
-% w trybie continous można podawać id poprzednio wyliczonej lokalizacji
 
 \subsection{Geografia}
 %http://fiddle.jshell.net/jk0uumn0/10/
@@ -121,7 +107,7 @@ Chcąc szacować ilość sieci bezprzewodowych w Warszawie, trzeba zacząć od l
 W przypadku algorytmu estymującego lokalizację użytkownika na podstawie zarejestrowanych sieci bezprzewodowych musimy rozważyć wiele czynników takich jak:
 
 \begin{itemize}
-    \item urządzenia wypożyczone konsumentom - dostawcy usług telekomunikacyjnych nierzadko przywracają sprawne urządzenia do kolejnego klienta bez zmiany identyfikatorów sprzętowych 
+    \item urządzenia wypożyczone konsumentom - dostawcy usług telekomunikacyjnych nierzadko przywracają sprawne urządzenia do kolejnego klienta bez zmiany identyfikatorów sprzętowych
     \item mobilne hotspoty - smartfony mają możliwość tworzenia punktów dostępu dla innych urządzeń. Są też dedykowane rozwiązania rozdawane do abonamentów przez operatorów telekomunikacyjnych, takie jak Huawei MIFI.
     \item migracja ludności - na własnym przykładzie mogę powiedzieć, że od 3 lat mam ten sam Punkt Dostępu, a w od kiedy go zakupiłem, przeprowadziłem się już 2 razy. Wielokrotnie miałem sytuacje, w których estymowana lokalizacja z Google, pokazywała okolice mojego poprzedniego zamieszkania. Szczególnie przy drugiej przeprowadzce.
 \end{itemize}
@@ -129,33 +115,16 @@ W przypadku algorytmu estymującego lokalizację użytkownika na podstawie zarej
 % zdjęcie mifi?
 % zdjęcie routera ASUS?
 
-
-% wymagane zageszczenie zeby moc nawigowac z dokladnoscia X
-
-%\section{Projektowanie i planowanie}
-%Podstawowym urządzeniem, które będzie częścią tej pracy będzie Smartfon. Ze względu na posiadany na pokładzie odbiornik GPS oraz kartę sieci bezprzewodowej WIFI. Dodatkowym atutem będzie komunikacja z internetem poprzez sieć GSM. Dzięki takiemu zestawowi technologii w jednym urządzeniu, będziemy mogli porównać estymowaną lokalizację na podstawie wykrytych sieci bezprzewodowych, z lokalizacją zmierzoną przez odbiornik GPS. Na to urządzenie powstanie aplikacja mobilna, w której na mapie porównamy skuteczność szacowania lokalizacji na podstawie sieci bezprzewodowych, do lokalizacji opartej na technologii GPS. Dodatkowo aplikacja ta będzie umożliwiała aktualizację lokalizacji sieci bezprzewodowych na podstawie sygnału GPS, aby baza danych lokalizacji sieci WIFI była jeszcze dokładniejsza.
-
-%Drugim filarem części praktycznej będzie aplikacja internetowa, w której będzie zaimplementowane szacowanie lokalizacji na podstawie sieci bezprzewodowych w zasięgu komputera. Implementacja geolokalizacji będzie zgodna ze specyfikacją interfejsu programistycznego Google Maps, ale tylko w ramach technologii bezprzewodowych sieci WIFI. Zgodność ze specyfikacją pozwoli na wykorzystanie tej aplika 
-
-
-%TODO opisanie dlaczego aplikacja internetowa jest wymagana - rozmiar publicznych danych, możliwość dalszego rozwoju dla LocationProvider'ów i geolokacji przeglądarek internetowych
-
-%NOT-TODO: omówienie zależności nazw wifi do okolicznych firm/taksówek
-
-%Publiczne zbiory z zapisanymi lokalizacjami sieci bezprzewodowych mają rozmiary, które przekraczają rozsądne dla urządzeń mobilnych możliwości obliczeniowe i przechowywania danych.
-
-%Dlatego więc powstaną dwie aplikacje - internetowa, która będzie zbiorem wszystkich informacji o sieciach bezprzewodowych w Warszawie oraz akompaniująca aplikacja mobilna, która będzie pełniła dwie role: zbieranie i przekazywanie informacji o sieciach bezprzewodowych do serwera, oraz prezentację algorytmów geolokalizujących na podstawie sieci bezprzewodowych wykrywanych poprzez urządzenie mobilne.
-
 \section{Aplikacja internetowa}
 Natomiast rolą aplikacji internetowej będzie geolokalizacja na podstawie podanych adresów MAC oraz siły sygnału widocznych sieci. Miejsce zapisu zebranych danych, import dużych danych, wizualizacja, analiza, zapytania na bazie
 
 \subsection{Ruby}
 Ruby jest obiektowo-funkcyjnym interpretowanym językiem. Posiada zaimplementowane Odśmiecanie pamięci (z ang. Garbage Collector). \textit{Ruby bazuje na wielu językach, takich jak CLU, Eiffel, Lisp, Perl, Python czy Smalltalk. Składnia jest zorientowana liniowo i oparta na składni CLU oraz, w mniejszym stopniu, Perla.}\cite{RubyWiki}
 
-Ruby został stworzony przez Yukihiro Matsumoto w 1995 roku. Od tego czasu doczekał się wielu poprawek i optymalizacji. Jest to też jeden z niewielu języków, który posiada wiele interpreterówz pośród, których najbardziej popularnymi implementacjami obecnie są:
+Ruby został stworzony przez Yukihiro Matsumoto w 1995 roku. Od tego czasu doczekał się wielu poprawek i optymalizacji. Jest to też jeden z niewielu języków, który posiada wiele interpreterów spośród, których najbardziej popularnymi implementacjami obecnie są:
 \begin{itemize}
     \item MRI (Matz's Ruby Interpreter) - jest wyjściową implementacją i jest de facto specyfikacją języka
-    \item JRuby - w większości napisany w Javie. osiągnął dosyć dużą popularność, ze względu na dobrą zgodność z oryginalną specyfikacją przy większej wydajności.
+    \item JRuby - w większości napisany w Javie. Osiągnął dosyć dużą popularność, ze względu na dobrą zgodność z oryginalną specyfikacją przy większej wydajności.
     \item Ruboto - Nakładka na JRuby, która pozwala tworzyć aplikacje na Androida.
     \item RBX (Rubinus) - Oparty na projekcie maszyny wirtualnej Smalltalk-80
     \item RubyMotion - komercyjna implementacja na iOS, Mac OS X oraz Android
@@ -164,11 +133,11 @@ Ruby został stworzony przez Yukihiro Matsumoto w 1995 roku. Od tego czasu docze
 Wiele implementacji interpreterów. Przejrzysty i czytelny kod, który czyta się prawie jak naturalny język angielski. Spowodowały, że w latach 2008-2012 był najpopularniejszym językiem na GitHub.\cite{RubyStats2015} Niestety w kolejnych latach jego popularność spadała. W 2013 był drugi, w 2014 i 2015 był trzeci\cite{RubyStats2015}, w 2016 był już szósty i tak jest do dziś.\cite{GithutStats2017}
 
 \subsubsection{Ruby on Rails}
-Ruby on Rails jest zestawem bibliotek, które tworzą szkielet (z ang. framework) do budowania aplikacji  internetowych zgodnie ze wzorcem architektonicznym Model-Widok-Kontroler (MVC) oraz z paradygmatem projektowym (z ang. design paradigm) Konwencja-Ponad-Konfiguracją (z ang. Convention-Over-Configuration). Kolejną ideą jest \textit{Nie powtarzaj się} (z ang. Don't Repeat Yourself) - sednem tej idei jest modularyzacja i poprawna strukturyzacja kodu. Dzięki takiemu podejściu kod aplikacji jest łatwiej czytać, modyfikować i testować. 
+Ruby on Rails jest zestawem bibliotek, które tworzą szkielet (z ang. framework) do budowania aplikacji internetowych zgodnie ze wzorcem architektonicznym Model-Widok-Kontroler (MVC) oraz z paradygmatem projektowym (z ang. design paradigm) Konwencja-Ponad-Konfiguracją (z ang. Convention-Over-Configuration). Kolejną ideą jest \textit{Nie powtarzaj się} (z ang. Don't Repeat Yourself) - sednem tej idei jest modularyzacja i poprawna strukturyzacja kodu. Dzięki takiemu podejściu kod aplikacji jest łatwiej czytać, modyfikować i testować.
 
-%Warto jeszcze wspomnieć o standardach, które rządzą światem kontrolerów są to CRUD i REST. Pierwszy opisuje podstawowe operacje, które można wykonywać na 
+%Warto jeszcze wspomnieć o standardach, które rządzą światem kontrolerów są to CRUD i REST. Pierwszy opisuje podstawowe operacje, które można wykonywać na
 
-Połączenie dużej refleksyjności Rubiego, świetnej biblioteki ORM, czystej i zorganizowanej struktury plików, która dzięki konwencji, w każdym projekcie jest zawsze taka sama stworzyło jedno z najbardziej lubianych i najlepiej ocenianych pod względem produktywności środowisk do wytwarzania aplikacji internetowych.
+Połączenie dużej refleksyjności Rubiego, świetnej biblioteki ORM, czystej i zorganizowanej struktury plików, która dzięki konwencji, w każdym projekcie jest zawsze taka sama, to stworzyło jedno z najbardziej lubianych i najlepiej ocenianych pod względem produktywności środowisk do wytwarzania aplikacji internetowych.
 
 Ze względu na bardzo kosztowną naturę powstawania aplikacji internetowych opartych na rozwiązaniu Ruby on Rails, popularność tej technologii w morzu internetu jest niszowa.\cite{TrendsBuiltWithRails}
 
@@ -180,19 +149,19 @@ Ze względu na bardzo kosztowną naturę powstawania aplikacji internetowych opa
 Kategoria & Liczba wykrytych z liczbą wszystkich & Procent \\
 \hline
 \hline
-Top 10 tyś na postawie Quantcast & 558 z 10 000 & 5.6\% \\
+Top 10 tys. na postawie Quantcast & 558 z 10 000 & 5.6\% \\
 \hline
-Top 100 tyś na postawie Quantcast & 3 415 z 100 000 & 3.4\% \\
+Top 100 tys. na postawie Quantcast & 3 415 z 100 000 & 3.4\% \\
 \hline
 Cała baza builtwith.com & 1,162,698 z 370,442,435 & 0.3\% \\
 \hline
 \end{tabular}
 \end{table}
 
-Jak widać z Tablicy \ref{table:rubyusage} z tego rozwiązania korzystają aplikacje internetowe które są oceniane wysoko w rankingu Quantcast. Strony takie potrzebują wysokiej jakości dopasowanych do ich potrzeb rozwiązań. Oczywiście nie zaprzeczam, że można korzystać z Ruby on Rails przy prostych potrzebach takich jak blogi z systemami zarządzania treścią lub przy kampaniach promocyjnych czy stronach produktów. Jednakże koszt powstania takiej strony internetowej jest niepotrzebnie duży. Przy takich potrzebach na rynku rozwiązań dużo lepszym rozwiązaniem byłby Wordpress, Joomla lub inny system do zarządzania treścią. Rozwiązania oparte na PHP mają mniejszy koszt infrastruktury w porównaniu do Ruby on Rails. Wsparcie techniczne i specjaliści są tańsi i łatwiej osiągalni.
+Jak widać z Tablicy \ref{table:rubyusage} z tego rozwiązania korzystają aplikacje internetowe, które są oceniane wysoko w rankingu Quantcast. Strony takie potrzebują wysokiej jakości dopasowanych do ich potrzeb rozwiązań. Oczywiście nie zaprzeczam, że można korzystać z Ruby on Rails przy prostych potrzebach takich jak blogi z systemami zarządzania treścią lub przy kampaniach promocyjnych czy stronach produktów. Jednakże koszt powstania takiej strony internetowej jest niepotrzebnie duży. Przy takich potrzebach na rynku rozwiązań dużo lepszym rozwiązaniem byłby Wordpress, Joomla lub inny system do zarządzania treścią. Rozwiązania oparte na PHP mają mniejszy koszt infrastruktury w porównaniu do Ruby on Rails. Wsparcie techniczne i specjaliści są tańsi i łatwiej osiągalni.
 
 \subsection{HTML}
-Aplikacje internetowe nie istniałaby bez języka HTML. Ten już dość przestarzały język był wielokrotnie poprawiany i rozwijany na przestrzeni lat. Ale wciąż istnieje i nowoczesna jego odmiana w większości jest kompatybilna z poprzednimi wersjami.
+Aplikacje internetowe nie istniałaby bez języka HTML. Ten już dość przestarzały język był wielokrotnie poprawiany i rozwijany na przestrzeni lat. Wciąż istnieje i nowoczesna jego odmiana w większości jest kompatybilna z poprzednimi wersjami.
 
 \subsection{JavaScript}
 Ze względu na ograniczenia interaktywności dokumentów HTML w pracy zostanie wykorzystany język JavaScript. W nowoczesnych aplikacjach internetowych jest to absolutnie normalne, że wykorzystuje się ten język do poprawienia użyteczności i ergonomiczności aplikacji. Pozwala tworzyć bardziej responsywne interfejsy użytkownika i wymieniać informacje z serwerem bez przeładowywania całej strony internetowej.
@@ -207,7 +176,7 @@ Język obecnie przeżywa drugie narodziny ze względu na wytworzoną przez Googl
 To struktura danych, która zrodziła się na podstawie JavaScriptu.\cite{JsonWiki} Stał się nieodłącznym elementem w komunikacjach z interfejsami programistycznymi aplikacji internetowych ze względu na większą czytelność w trakcie procesu rozwoju oprogramowania od rozwiązań takich jak XML czy HTML. Nie posiada zadeklarowanej struktury do przechowywania danych i między innymi dlatego tak często z niego się korzysta przy prostych komunikacjach typu AJAX. Implementacja generatorów oraz parserów do tego standardu znajduje się w większości języków programistycznych.
 
 %\subsubsection{GeoJSON}
-%Jest otwartym standardem opisującym proste geograficzne kształty. 
+%Jest otwartym standardem opisującym proste geograficzne kształty.
 
 \subsection{PostgreSQL}
 Źródłowo otwarty system zarządzania obiektowo-relacyjną bazą danych. Dla twórców ważną ideą jest zgodność ze standardami oraz możliwość rozszerzania funkcjonalności poprzez różne dodatki. Posiada implementacje na wszystkie najpopularniejsze systemy operacyjne takie jak Windows, Linux oraz Unix. Postgres (w skrócie od słowa PostgreSQL) dąży do pełnej zgodności ze standardem ACID.\cite{PostgresWiki}
