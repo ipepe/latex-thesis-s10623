@@ -11,6 +11,9 @@
 \usepackage{listings}
 \usepackage{caption}
 \usepackage{minted}
+\usepackage{glossaries}
+
+\makeglossaries
 
 \author{Patryk Ptasiński}
 \album{10623}
@@ -19,6 +22,8 @@
 \supervisor{dr. inż Michał Tomaszewski}
 \location{Warszawa}
 \date{czerwiec 2017}
+%\set@@faculty{inf}
+%\set@@spec{h}
 
 \begin{document}
 
@@ -34,7 +39,7 @@
 \include{_Wprowadzenie}
 \include{_Teoria}
 \include{_Praktyka}
-%\include{_Slownik_pojec}
+\include{_Slownik_pojec}
 
 
 %\addcontentsline{toc}{chapter}{Literatura}
@@ -43,5 +48,5 @@
 
 \bibliographystyle{abbrv}
 \bibliography{bibliografia}
-    
+
 \end{document}

@@ -1,15 +1,15 @@
 \chapter{Część praktyczna}
-W rozdziale tym przedstawię proces utworzenia aplikacji internetowej oraz mobilnej. Omówię wyzwania oraz problemy, z którymi się spotkałem podczas implementacji. Opiszę też zasadę działania algorytmów potrzebnych do realizacji podstawowych założeń aplikacji mobilnej oraz internetowej. Na koniec przeprowadzę badania i wyciągnę wnioski które skonfrontuje z postawioną tezą.
+W rozdziale tym przedstawię proces utworzenia aplikacji internetowej oraz mobilnej. Omówię wyzwania oraz problemy, z którymi się spotkałem podczas implementacji. Opiszę też zasadę działania algorytmów potrzebnych do realizacji podstawowych założeń aplikacji mobilnej oraz internetowej. Na koniec przeprowadzę badania i wyciągnę wnioski, które skonfrontuje z postawioną tezą.
 
 \section{Przygotowanie}
 Aby rozpocząć prace nad utworzeniem aplikacji internetowej i mobilnej potrzebny jest warsztat sprzętowy oraz odpowiedniego oprogramowania zainstalowanego i skonfigurowanego na danym sprzęcie.
 
 \subsection{Sprzęt}
-Do wytworzenia aplikacji internetowej oraz mobilnej potrzebny jest komputer. W moim przypadku środowisko programistyczne zainstalowałem i skonfigurowałem na MacBooku Pro z 2011 roku. Do celów badawczych pracy potrzebny mi był smartfon z systemem operacyjnym Android. Wykorzystałem do tego zadania LG Nexus 5. Dodatkowo jeżeli mamy smartfon z systemem Android to nie musimy konfigurować emulatora, co w przypadku mojego komputera mogłoby bardzo ograniczyć zasoby pamięci RAM.
+Do wytworzenia aplikacji internetowej oraz mobilnej potrzebny jest komputer. W moim przypadku środowisko programistyczne zainstalowałem i skonfigurowałem na MacBooku Pro z 2011 roku. Do celów badawczych pracy potrzebny mi był smartfon z systemem operacyjnym Android. Wykorzystałem do tego zadania LG Nexus 5. Dodatkowo, jeżeli mamy smartfon z systemem Android to nie musimy konfigurować emulatora, co w przypadku mojego komputera mogłoby bardzo ograniczyć zasoby pamięci RAM.
 
 \subsection{Oprogramowanie}
 \subsubsection{Git}
-Korzystając z nowoczesnych narzędzi wytwarzania oprogramowania naturalnym jest, aby korzystać z systemu kontroli wersji. Osobiście mam doświadczenie z systemem Git. Aby korzystać z takiego systemu potrzebujemy mieć zainstalowane narzędzie klienckie. Ponadto potrzebujemy mieć skonfigurowane repozytoria na odpowiednim serwerze. Ja do tego celu wykorzystałem darmowy plan na platformie Github. Utworzyłem dwa repozytoria, oddzielne dla aplikacji internetowej i aplikacji mobilnej.
+Korzystając z nowoczesnych narzędzi wytwarzania oprogramowania, naturalne jest korzystanie z systemu kontroli wersji. Osobiście mam doświadczenie z systemem Git. Aby korzystać z takiego systemu, potrzebujemy mieć zainstalowane narzędzie klienckie. Ponadto potrzebujemy mieć skonfigurowane repozytoria na odpowiednim serwerze. Ja do tego celu wykorzystałem darmowy plan na platformie Github. Utworzyłem dwa repozytoria, oddzielne dla aplikacji internetowej i aplikacji mobilnej.
 
 \subsubsection{Ruby}
 Spośród wielu implementacji oraz narzędzi do zarządzania środowiskiem uruchomieniowym Ruby wybrałem wersję 2.3.3, która na dzień tworzenia projektu była najnowsza. Do zarządzania wersją Ruby wykorzystuję narzędzie rbenv.
@@ -24,10 +24,10 @@ PostgreSQL na środowiska Mac OS można ściągnąć w postaci zwykłej aplikacj
 Najprostszym sposobem wytwarzania oprogramowania dla systemów Android jest korzystanie z pakietu Android Studio. Najnowsza wersja na dzień utworzenia projektu to 2.3.2. W ramach instalacji tego środowiska programistycznego zostało zainstalowanych wiele bibliotek. Między innymi SDK Manager, w którym zainstalowałem SDK Platformy o oznaczeniu Android 7.1.1 (Nougat), której poziom API to 25.
 
 \subsubsection{Przeglądarka internetowa}
-Gdy mowa o aplikacji internetowej, to nie można zapomnieć o jej kliencie - przeglądarce internetowej. Przy rozwoju aplikacji opartej na Ruby on Rails, nie ma większego znaczenia z jakiej przeglądarki skorzystamy. Osobiście jednak polecam aby na komputerze posiadać przeglądarki kilku firm, ze względu na kompatybilność. Jak się dowiemy w późniejszych rozdziałach, ma to znaczenie przy rozwoju takiej aplikacji internetowej.
+Gdy mowa o aplikacji internetowej, to nie można zapomnieć o jej kliencie — przeglądarce internetowej. Przy rozwoju aplikacji opartej na Ruby on Rails, nie ma większego znaczenia, z jakiej przeglądarki skorzystamy. Osobiście jednak polecam, aby na komputerze posiadać przeglądarki kilku firm, ze względu na kompatybilność. Jak się dowiemy w późniejszych rozdziałach, ma to znaczenie przy rozwoju takiej aplikacji internetowej.
 
 \section{Aplikacja internetowa}
-Implementację rozpocząłem od importu istniejących danych o lokalizacjach sieci WIFI z różnych serwisów. Potem skupiłem się na prezentacji zaimportowanych danych. Na koniec stworzyłem ścieżkę pod którą można geolokalizować na podstawie podanych adresów MAC i siły sygnałów podanych sieci bezprzewodowych.
+Implementację rozpocząłem od importu istniejących danych o lokalizacjach sieci WIFI z różnych serwisów. Potem skupiłem się na prezentacji zaimportowanych danych. Na koniec stworzyłem ścieżkę, pod którą można geolokalizować na podstawie podanych adresów MAC i siły sygnałów podanych sieci bezprzewodowych.
 
 \subsection{Struktura danych}
 W internecie można znaleźć trzy serwisy, które za darmo udostępniają zrzuty bazy z lokalizacjami bezprzewodowych sieci.
@@ -63,7 +63,7 @@ string   & bssid & null: false & \\
 \hline
 string   & ssid & & \\
 \hline
-datetime & observed\_at & & Informacja kiedy dana sieć została zaobserowana \\
+datetime & observed\_at & & Informacja, kiedy dana sieć została zaobserwowana \\
 \hline
 float    & latitude & null: false & Szerokość geograficzna \\
 \hline
@@ -73,9 +73,9 @@ datetime & geolocated\_at & & Gdy urządzenie rozróżnia czas ostatniej pozycji
 \hline
 string   & source & default: "internal" & Nazwa źródła skąd przyszły dane. Jeżeli import to odpowiednia nazwa serwisu. Jeżeli z aplikacji mobilnej, to odpowiedni identyfikator urządzenia \\
 \hline
-string   & id\_of\_source & & Identyfikator w ramach pola source - pozwoli na nie importowanie duplikatów lub możliwą aktualizację importowanych danych \\
+string   & id\_of\_source & & Identyfikator w ramach pola source; Pozwoli na nie importowanie duplikatów lub możliwą aktualizację importowanych danych \\
 \hline
-json     & raw\_info & & Wszystkie atrybuty jakie były zadeklarowane do obserwacji. Jeżeli byśmy importowali jakieś dane, które nie mają odpowiedniej kolumny w bazie danych, to w przyszłości możemy te dane wyciągnąć z tej kolumny. \\
+json     & raw\_info & & Wszystkie atrybuty, jakie były zadeklarowane do obserwacji. Jeżeli byśmy importowali jakieś dane, które nie mają odpowiedniej kolumny w bazie danych, to w przyszłości możemy te dane wyciągnąć z tej kolumny. \\
 \hline
 datetime & created\_at & & Data i czas utworzenia rekordu (domyślnie dodawane przez Ruby on Rails) \\
 \hline
@@ -84,52 +84,99 @@ datetime & updated\_at & & Data i czas modyfikacji rekordu (domyślnie dodawane 
 \end{tabular}
 \end{table}
 
-Ze względu na prędkość importu zdecydowałem się zdenormalizować obserwacje punktów dostępów. Kolumna BSSID - opisującą adres sprzętowy urządzenia będzie posiadała powtarzające się dane. Dzięki temu mogłem użyć biblioteki activerecord-import. Która pozwala na import danych do bazy danych poprzez bardzo praktyczny interfejs, ale przede wszystkim w sposób bardzo szybki. Dzięki tej decyzji import informacji o lokalizacjach sieci bezprzewodowych dla obszaru Warszawy zajął prawie 6 godzin na moim komputerze.
+Dodatkowym problemem stała się samo BSSID. W każdej z importowanych baz zostało zapisane w inny sposób. Okazało się, że w ramach importu bazy ze strony mylnikov.org sposób zapisu BSSID się różni. Czasem wszystkie litery były duże. Innym razem wszystkie były małe. Aby ujednolicić zapis, utworzyłem odpowiednią metodę klasową, którą potem wykorzystałem we wszystkich miejscach, skąd przyjmowałem informacje o BSSID.
+
+\begin{minted}{ruby}
+def self.standardize_bssid(value)
+  # 00:0A:E6:3E:FD:E1
+  result = value.to_s.upcase.gsub(/[^A-F0-9]/, '')
+  return nil if result.size != 12
+  result
+end
+\end{minted}
+
+Ze względu na prędkość importu zdecydowałem się zdenormalizować obserwacje punktów dostępów. Kolumna BSSID — opisującą adres sprzętowy urządzenia będzie posiadała powtarzające się dane. Dzięki temu mogłem użyć biblioteki activerecord-import. Która pozwala na import danych do bazy danych poprzez bardzo praktyczny interfejs, ale przede wszystkim w sposób bardzo szybki. Dzięki tej decyzji import informacji o lokalizacjach sieci bezprzewodowych dla obszaru Warszawy zajął prawie 6 godzin na moim komputerze.
 
 \subsection{Prezentacja danych na mapie}
-Do prezentacji danych jakimi są lokalizacje sieci bezprzewodowych wykorzystałem gotową bibliotekę Leaflet. Wykorzystywanie gotowych elementów interfejsu często przyspiesza pracę nad projektami. Zwłaszcza tak skomplikowanego interfejsu jakim jest mapa. Sama biblioteka implementuje obsługę współrzędnych geograficznych, przybliżania i oddalania oraz prostych znaczków i kształtów geograficznych. Podstawowym elementem jaki musiałem dodać to grafiki mapy - tzw. płytki map (z ang. map tiles). Mój wybór padł na dostawcę darmowych grafik - serwis CartoDB. Udostępniają oni wysokiej jakości, schludne grafiki do wyboru w kilku odcieniach. Na potrzeby tej pracy wybrałem minimalistyczną i ciemną wersję o nazwie dark. Do Leafleta dodałem jeszcze dwa dodatki: jeden odpowiedzialny za pobieranie danych standardem AJAX oraz drugi, który jest odpowiedzialny za klastrowanie dużej ilości znaczników na mapie w grupy.
+Do prezentacji danych, jakimi są lokalizacje sieci bezprzewodowych, wykorzystałem gotową bibliotekę Leaflet. Wykorzystywanie gotowych elementów interfejsu często przyspiesza pracę nad projektami. Zwłaszcza tak skomplikowanego interfejsu, jakim jest mapa. Sama biblioteka implementuje obsługę współrzędnych geograficznych, przybliżania i oddalania oraz prostych znaczków i kształtów geograficznych. Podstawowym elementem, jaki musiałem dodać to grafiki mapy — tzw. płytki map (z ang. map tiles). Mój wybór padł na dostawcę darmowych grafik — serwis CartoDB. Udostępniają oni wysokiej jakości, schludne grafiki do wyboru w kilku odcieniach. Na potrzeby tej pracy wybrałem minimalistyczną i ciemną wersję o nazwie dark. Do Leafleta dodałem jeszcze dwa dodatki: jeden odpowiedzialny za pobieranie danych standardem AJAX oraz drugi, który jest odpowiedzialny za klastrowanie dużej ilości znaczników na mapie w grupy.
 
-Dla widoku mapy utworzyłem ścieżkę na serwerze, pod którą można pobrać znaczniki z lokalizacjami sieci bezprzewodowych. Zdecydowałem się na strukturę danych określoną w standardzie GeoJSON ze względu na
+Dla widoku mapy utworzyłem ścieżkę na serwerze, pod którą można pobrać znaczniki z lokalizacjami sieci bezprzewodowych. Zdecydowałem się na strukturę danych określoną w standardzie GeoJSON ze względu na kompatybilność z biblioteką Leaflet, dodatkowo stosując takie rozwiązanie, interfejs programistyczny jest bardziej przystępny do wykorzystania.
 
-%Ze względu na ogrom danych jakimi są zapisane lokalizacje sieci bezprzewodowych, potrzebne jest wykorzystanie mechanizmu AJAX.
+Ze względu na ogrom danych, jakimi są zapisane lokalizacje sieci bezprzewodowych, potrzebne jest wykorzystanie mechanizmu AJAX i ograniczenia przesyłanych danych do 25 tysięcy struktur GeoJSON. To ograniczenie wynika z wydajności przeglądarki do prezentacji tak dużej ilości danych. Więcej i przeglądarka Firefox miała kilkusekundowe przestoje podczas przeładowywania danych.
+
+Samo generowanie struktury GeoJSON zaimplementowałem poprzez odpowiednie dwie metody:
+
+\begin{minted}{ruby}
+def geojson_hash
+  {
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: geojson_coordinates
+    },
+    properties: {
+      id: id,
+      bssid: bssid
+    }
+  }
+end
+
+def geojson_coordinates
+  [longitude, latitude]
+end
+\end{minted}
 
 \subsection{Algorytm geolokalizacji}
-Podstawą algorytmu jest średnia ważona współrzędnych geograficznych pozycji sieci bezprzewodowych o najmocniejszym sygnale, znalezionych na podstawie podanych adresów MAC, a gdzie waga będzie wyliczana na podstawie:
+
+Pierwotna wersja algorytmu zakładała podanie lokalizacji dla sieci bezprzewodowej o najmocniejszym sygnale, spośród wykrytych przez urządzenie użytkownika. Jednak to nie dawało zadowalających rezultatów. Lokalizacja podawana użytkownikowi dość często była po prostu niepoprawna.
+
+\begin{minted}{ruby}
+class WifiGeolocateService
+  def self.query(params)
+    return nil if params[:wifiAccessPoints].blank?
+    #TODO: save all params for future reference?
+    result = {
+      "location": {
+        "lat": nil,
+        "lng": nil
+      },
+      "accuracy": nil,
+      meta: []
+    }
+    params[:wifiAccessPoints].sort_by { |ap| ap[:signalStrength] }.reverse.each do |ap|
+      if (observation = WifiObservation.
+        where(bssid: WifiObservation.standardize_bssid(ap[:macAddress])).
+        order(observed_at: :desc).
+        first).present?
+        if result["accuracy"].blank?
+          result["location"]["lat"] ||= observation.latitude
+          result["location"]["lng"] ||= observation.longitude
+          result["accuracy"] ||= observation.geolocation_accuracy
+        end
+        result["meta"].push(observation.geojson_hash)
+      end
+    end
+    result
+  end
+end
+\end{minted}
+
+W kolejnych iteracjach powstał algorytm, którego podstawą działania jest średnia ważona współrzędnych geograficznych pozycji sieci bezprzewodowych o najmocniejszym sygnale, znalezionych na podstawie podanych adresów MAC, a gdzie waga będzie wyliczana na podstawie:
 
 \begin{itemize}
 \item daty ostatniej obserwacji
 \item podanej siły sygnału
-\item nieliniowego współczynnika odchylenia lokalizacji od innych lokalizacji sieci bezprzewodowych - jego zadaniem jest eliminacja lub ograniczenie znaczenia sieci, których lokalizacja w bazie danych może być nieaktualna
+\item nieliniowego współczynnika odchylenia lokalizacji od innych lokalizacji sieci bezprzewodowych — jego zadaniem jest eliminacja lub ograniczenie znaczenia sieci, których lokalizacja w bazie danych może być nieaktualna
 \end{itemize}
 
-\section{Aplikacja mobilna}
-\subsection{Baza danych}
-% denormalizowana
-% wykorzystująca ORM ActiveAndroid
-\subsection{Mapa}
-% trzeba było włączyć CORS
+% TODO snippet algorytmu
 
-\subsection{Wardriving}
-\subsubsection{Standard \_nomap i \_opt\_out}
-Google zaproponowało dopisywanie do końca nazwy sieci \_nomap (z ang. nie mapuj) aby ich rozwiązania nie zbierały informacji o lokalizacji danych sieci bezprzewodowych.\cite{GoogleNomap} Dodatkowego zamieszania dorzuciła firma Microsoft gdzie dla swoich rozwiązań zaproponowali \_optout (z ang. wypisz mnie).\cite{MicrosoftOptout}
+\subsection{Specyfikacja do Geolokalizacji użytkownika}
+Interfejs do wykonania geolokalizacji przez aplikację internetową utworzyłem na podstawie specyfikacji produktu Google Maps.\cite{GoogleMapsGeolocationAPI} Oczywiście ta specyfikacja opisuje o wiele bardziej obszerne parametry do geolokalizacji. W ramach tej pracy zaimplementowałem parametry określające sieci bezprzewodowe: BSSID oraz siłę sygnału odebraną przez urządzenie.
 
-%\subsubsection{Zbieranie nazw sieci wifi}
-%Prawo w stanach zabrania jakieś źródła czy cuś
-\subsubsection{Problem z określeniem lokalizacji}
-Nie jest możliwym stwierdzenie z jakiego kierunku przyszedł sygnał. Co przy mapowaniu przy użyciu telefonu komórkowego spodowuje umiejscowienie wszystkich sieci wifi na pozycji telefonu. Np. na środku ulicy lub na chodniku.
-Ze względu na lokalizację między dwoma punktami klient-serwer.
-% widać to świetnie na tej mapie: http://owm.vreeken.net/map/
-% zrobić obraze
+\subsection{Widoki}
+Wszystkie widoki aplikacji internetowej wykorzystują Boostrap oraz jQuery. Wykorzystanie tych bibliotek pozwala na szybkie tworzenie aplikacji, których użyteczność i estetyka są na zadowalającym poziome. Dodatkowo style Boostrapa są przystosowane do prezentacji widoków aplikacji w różnych rozdzielczościach ekranów. Nawet dla przeglądarek internetowych na smartfonach strona prezentuje się poprawnie i schludnie.
 
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=10cm]{images/poor-scan-result}
-  \caption{Prezentacja lokalizacji sieci bezprzewodowych na mapie - algorytm primitywny}
-  \label{fig:warsaw10kmRadius}
-\end{figure}
-
-Rozwiązaniem droższym byłoby użycie kilku urządzeń, najlepiej z antenami kierunkowymi, dzięki czemu moglibyśmy stwierdzić czy stacja bazowa znajduje się po lewej stronie ulicy czy po prawej na podstawie siły sygnału.
-Dzięki technologii MIMO można określić z którego kierunku przyszedł sygnał na jednym urządzeniu.
 
 
 \section{Publikacja projektu}
