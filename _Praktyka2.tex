@@ -168,201 +168,29 @@ public WifiObservation(ScanResult scanResult, Location location){
 
 \section{Badanie i wnioski}
 
-\being{minted}{ruby}
-irb(main):001:0> WifiPosition.count
-   (38.9ms)  SELECT COUNT(*) FROM "wifi_positions"
-=> 205584
-irb(main):002:0> distance = 1
-=> 1
-irb(main):003:0> center_point = [52.273075, 20.97459382]
-=> [52.273075, 20.97459382]
-irb(main):013:0> box = Geocoder::Calculations.bounding_box(center_point, distance)
-=> [52.26408178394081, 20.95989659200551, 52.28206821605919, 20.989291047994488]
-irb(main):014:0> WifiPosition.within_bounding_box(box).count
-   (47.0ms)  SELECT COUNT(*) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26408178394081 AND 52.28206821605919 AND wifi_positions.longitude BETWEEN 20.95989659200551 AND 20.989291047994488)
-=> 3453
-irb(main):006:0>
+\begin{minted}{ruby}distance = 0.5
+warsaw_spire_plac_europejski_1 = [52.232175, 20.984187]
+losowy = [52.273075, 20.974593]
+zeromskiego_1 = [ 52.275371, 20.960779]
+
+[
+  WifiPosition.within_bounding_box(Geocoder::Calculations.bounding_box(losowy, distance)).length,
+  WifiPosition.within_bounding_box(Geocoder::Calculations.bounding_box(warsaw_spire_plac_europejski_1, distance)).length,
+  WifiPosition.within_bounding_box(Geocoder::Calculations.bounding_box(zeromskiego_1, distance)).length
+]
 \end{minted}
 
-
-irb(main):001:0> WifiPosition.count
-   (38.9ms)  SELECT COUNT(*) FROM "wifi_positions"
-=> 205584
-irb(main):002:0> distance = 1
-=> 1
-irb(main):003:0> center_point = [52.273075, 20.97459382]
-=> [52.273075, 20.97459382]
-irb(main):004:0> box = Geocoder::Calculations.bounding_box(center_point, distance)
-=> [52.25860182168891, 20.950940924301403, 52.287548178311084, 20.998246715698595]
-irb(main):005:0> WifiPosition.within_bounding_box(box).count
-   (86.4ms)  SELECT COUNT(*) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.25860182168891 AND 52.287548178311084 AND wifi_positions.longitude BETWEEN 20.950940924301403 AND 20.998246715698595)
-=> 5967
-irb(main):006:0> Geocoder::Calculations.distance_between(box[0], box[1], box[2], box[3])
-ArgumentError: wrong number of arguments (given 4, expected 2..3)
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/geocoder-1.4.4/lib/geocoder/calculations.rb:84:in `distance_between'
-        from (irb):6
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console.rb:65:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console_helper.rb:9:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:78:in `console'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:49:in `run_command!'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands.rb:18:in `<top (required)>'
-        from bin/rails:4:in `require'
-        from bin/rails:4:in `<main>'
-irb(main):007:0> Geocoder::Calculations.distance_between([box[0], box[1]], [box[2], box[3]])
-=> 2.8284270091915955
-irb(main):008:0> Geocoder::Calculations.distance_between([box[0], box[1]], [box[2], box[3]], units: :km)
-=> 4.551912038419051
-irb(main):009:0> Geocoder.configure(
-irb(main):010:1*   units: :km,
-irb(main):011:1*   language: :pl
-irb(main):012:1> )
-=> {:timeout=>3, :lookup=>:google, :ip_lookup=>:freegeoip, :language=>:pl, :http_headers=>{}, :use_https=>false, :http_proxy=>nil, :https_proxy=>nil, :api_key=>nil, :cache=>nil, :cache_prefix=>"geocoder:", :basic_auth=>{}, :logger=>:kernel, :kernel_logger_level=>2, :always_raise=>[], :units=>:km, :distances=>:linear}
-irb(main):013:0> box = Geocoder::Calculations.bounding_box(center_point, distance)
-=> [52.26408178394081, 20.95989659200551, 52.28206821605919, 20.989291047994488]
-irb(main):014:0> WifiPosition.within_bounding_box(box).count
-   (47.0ms)  SELECT COUNT(*) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26408178394081 AND 52.28206821605919 AND wifi_positions.longitude BETWEEN 20.95989659200551 AND 20.989291047994488)
-=> 3453
-irb(main):015:0> Geocoder::Calculations.distance_between([box[0], box[1]], [box[2], box[3]], units: :km)
-=> 2.8284270801305595
-irb(main):016:0> Geocoder::Calculations.distance_between([box[0], box[1]], [box[2], box[3]])
-=> 2.8284270801305595
-irb(main):017:0> WifiPosition.near(center_point, 1).count
-   (0.5ms)  SELECT COUNT(wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26408178394081 AND 52.28206821605919 AND wifi_positions.longitude BETWEEN 20.95989659200551 AND 20.989291047994488 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 1)
-ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR:  syntax error at or near "AS"
-LINE 1: ...wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distanc...
-                                                             ^
-: SELECT COUNT(wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26408178394081 AND 52.28206821605919 AND wifi_positions.longitude BETWEEN 20.95989659200551 AND 20.989291047994488 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 1)
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `async_exec'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `block in exec_no_cache'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract_adapter.rb:590:in `block in log'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activesupport-5.0.3/lib/active_support/notifications/instrumenter.rb:21:in `instrument'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract_adapter.rb:583:in `log'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `exec_no_cache'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:585:in `execute_and_clear'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql/database_statements.rb:103:in `exec_query'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/database_statements.rb:373:in `select'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/database_statements.rb:41:in `select_all'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/query_cache.rb:95:in `select_all'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:248:in `execute_simple_calculation'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:207:in `perform_calculation'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:121:in `calculate'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:40:in `count'
-        from (irb):17
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console.rb:65:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console_helper.rb:9:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:78:in `console'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:49:in `run_command!'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands.rb:18:in `<top (required)>'
-        from bin/rails:4:in `require'
-        from bin/rails:4:in `<main>'
-irb(main):018:0> WifiPosition.near(center_point, 1).limit(10000000).count
-   (0.5ms)  SELECT COUNT(count_column) FROM (SELECT  wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing AS count_column FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26408178394081 AND 52.28206821605919 AND wifi_positions.longitude BETWEEN 20.95989659200551 AND 20.989291047994488 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 1) LIMIT $1) subquery_for_count  [["LIMIT", 10000000]]
-ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR:  syntax error at or near "AS"
-LINE 1: ... * 57.2957795) + 360 AS decimal), 360) AS bearing AS count_c...
-                                                             ^
-: SELECT COUNT(count_column) FROM (SELECT  wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing AS count_column FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26408178394081 AND 52.28206821605919 AND wifi_positions.longitude BETWEEN 20.95989659200551 AND 20.989291047994488 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 1) LIMIT $1) subquery_for_count
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `async_exec'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `block in exec_no_cache'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract_adapter.rb:590:in `block in log'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activesupport-5.0.3/lib/active_support/notifications/instrumenter.rb:21:in `instrument'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract_adapter.rb:583:in `log'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `exec_no_cache'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:587:in `execute_and_clear'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql/database_statements.rb:103:in `exec_query'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/database_statements.rb:373:in `select'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/database_statements.rb:41:in `select_all'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/query_cache.rb:95:in `select_all'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:248:in `execute_simple_calculation'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:207:in `perform_calculation'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:121:in `calculate'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:40:in `count'
-        from (irb):18
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console.rb:65:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console_helper.rb:9:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:78:in `console'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:49:in `run_command!'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands.rb:18:in `<top (required)>'
-        from bin/rails:4:in `require'
-        from bin/rails:4:in `<main>'
-irb(main):019:0> WifiPosition.near(center_point, 100).count
-   (0.6ms)  SELECT COUNT(wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 51.37375339408127 AND 53.17239660591873 AND wifi_positions.longitude BETWEEN 19.504871020551196 AND 22.444316619448802 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 100)
-ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR:  syntax error at or near "AS"
-LINE 1: ...wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distanc...
-                                                             ^
-: SELECT COUNT(wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 51.37375339408127 AND 53.17239660591873 AND wifi_positions.longitude BETWEEN 19.504871020551196 AND 22.444316619448802 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 100)
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `async_exec'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `block in exec_no_cache'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract_adapter.rb:590:in `block in log'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activesupport-5.0.3/lib/active_support/notifications/instrumenter.rb:21:in `instrument'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract_adapter.rb:583:in `log'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `exec_no_cache'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:585:in `execute_and_clear'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql/database_statements.rb:103:in `exec_query'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/database_statements.rb:373:in `select'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/database_statements.rb:41:in `select_all'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/query_cache.rb:95:in `select_all'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:248:in `execute_simple_calculation'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:207:in `perform_calculation'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:121:in `calculate'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:40:in `count'
-        from (irb):19
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console.rb:65:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console_helper.rb:9:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:78:in `console'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:49:in `run_command!'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands.rb:18:in `<top (required)>'
-        from bin/rails:4:in `require'
-        from bin/rails:4:in `<main>'
-irb(main):020:0> WifiPosition.near(center_point, 1000).count
-   (0.6ms)  SELECT COUNT(wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 43.279858940812694 AND 61.2662910591873 AND wifi_positions.longitude BETWEEN 6.277365825511982 AND 35.67182181448801 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 1000)
-ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR:  syntax error at or near "AS"
-LINE 1: ...wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distanc...
-                                                             ^
-: SELECT COUNT(wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing) FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 43.279858940812694 AND 61.2662910591873 AND wifi_positions.longitude BETWEEN 6.277365825511982 AND 35.67182181448801 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 1000)
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `async_exec'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `block in exec_no_cache'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract_adapter.rb:590:in `block in log'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activesupport-5.0.3/lib/active_support/notifications/instrumenter.rb:21:in `instrument'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract_adapter.rb:583:in `log'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `exec_no_cache'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql_adapter.rb:585:in `execute_and_clear'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/postgresql/database_statements.rb:103:in `exec_query'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/database_statements.rb:373:in `select'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/database_statements.rb:41:in `select_all'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/connection_adapters/abstract/query_cache.rb:95:in `select_all'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:248:in `execute_simple_calculation'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:207:in `perform_calculation'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:121:in `calculate'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation/calculations.rb:40:in `count'
-        from (irb):20
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console.rb:65:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console_helper.rb:9:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:78:in `console'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:49:in `run_command!'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands.rb:18:in `<top (required)>'
-        from bin/rails:4:in `require'
-        from bin/rails:4:in `<main>'
-irb(main):021:0> WifiPosition.for_area(latitude: center_point[0], longitude: center_point[1]).count
-ArgumentError: unknown keyword: longitude
-        from /home/webapp/webapp/releases/20170621073617/app/models/wifi_position.rb:5:in `block in <class:WifiPosition>'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/scoping/named.rb:159:in `instance_exec'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/scoping/named.rb:159:in `block (2 levels) in scope'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/relation.rb:351:in `scoping'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/activerecord-5.0.3/lib/active_record/scoping/named.rb:159:in `block in scope'
-        from (irb):21
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console.rb:65:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/console_helper.rb:9:in `start'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:78:in `console'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands/commands_tasks.rb:49:in `run_command!'
-        from /home/webapp/webapp/shared/bundle/ruby/2.3.0/gems/railties-5.0.3/lib/rails/commands.rb:18:in `<top (required)>'
-        from bin/rails:4:in `require'
-        from bin/rails:4:in `<main>'
-irb(main):022:0> WifiPosition.near(center_point, 1).to_a.size
-  WifiPosition Load (93.2ms)  SELECT wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26408178394081 AND 52.28206821605919 AND wifi_positions.longitude BETWEEN 20.95989659200551 AND 20.989291047994488 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 1) ORDER BY distance ASC
-=> 2838
-irb(main):023:0> WifiPosition.near(center_point, 0.564189583).to_a.size
-  WifiPosition Load (56.9ms)  SELECT wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26800112118174 AND 52.27814887881826 AND wifi_positions.longitude BETWEEN 20.96630179706653 AND 20.982885842933467 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 0.564189583) ORDER BY distance ASC
-=> 566
-irb(main):024:0> WifiPosition.near(center_point, 1.1283791670).to_a.size
-  WifiPosition Load (103.7ms)  SELECT wifi_positions.*, 6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2))) AS distance, MOD(CAST((ATAN2( ((wifi_positions.longitude - 20.97459382) / 57.2957795), ((wifi_positions.latitude - 52.273075) / 57.2957795)) * 57.2957795) + 360 AS decimal), 360) AS bearing FROM "wifi_positions" WHERE (wifi_positions.latitude BETWEEN 52.26292724235448 AND 52.28322275764552 AND wifi_positions.longitude BETWEEN 20.95800977411837 AND 20.991177865881628 AND (6371.0 * 2 * ASIN(SQRT(POWER(SIN((52.273075 - wifi_positions.latitude) * PI() / 180 / 2), 2) + COS(52.273075 * PI() / 180) * COS(wifi_positions.latitude * PI() / 180) * POWER(SIN((20.97459382 - wifi_positions.longitude) * PI() / 180 / 2), 2)))) BETWEEN 0.0 AND 1.128379167) ORDER BY distance ASC
-=> 3556
+\begin{table}
+\caption{Kolumny i typy przechowywania danych wraz z ich znaczeniem}
+\label{table:density_result}
+\begin{tabular} { |l|l|  }
+\hline
+Lokalizacja & Ilość bezprzewodowych sieci na km\textsuperscript{2} \\
+\hline
+\hline
+Losowy punkt & 536 \\
+Plac Europejski 1 & 993 \\
+Żeromskiego 1 & 1129 \\
+\hline
+\end{tabular}
+\end{table}
