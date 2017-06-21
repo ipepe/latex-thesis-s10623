@@ -161,14 +161,102 @@ public WifiObservation(ScanResult scanResult, Location location){
 }
 \end{minted}
 
-\subsection{Prezentacja danych — mapa}
+\subsection{Określenie identyfikatora urządzenia}
+Przy zbieraniu informacji o lokalizacjach sieci bezprzewodowych chciałem, aby dane obserwacje były oznaczone, przez jakie urządzenie zostały zaimportowane. Stosując się do dobrych praktyk, napisałem metodę, która przy pierwszym uruchomieniu generuje unikalny identyfikator i zapisuje go w przestrzeni ustawień aplikacji mobilnej. Każde następne uruchomienie, pobierze ten wcześniej wygenerowany identyfikator.
+\begin{minted}{java}
+public String getUniqueDeviceId(){
+    SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+    String device_id = sharedPref.getString(preferenceUniqueIdKey, null);
+    if(device_id == null){
+        SharedPreferences.Editor editor = sharedPref.edit();
+        device_id = UUID.randomUUID().toString();
+        editor.putString(preferenceUniqueIdKey, device_id);
+        editor.apply();
+    }
+    return device_id;
+}
+\end{minted}
 
-% dodałem flagę "android wake lock flag" żeby ekran się nie usypiał
-% trzeba było włączyć CORS
+\subsection{Prezentacja danych — mapa}
+Finalną częścią aplikacji mobilnej była prezentacja danych oraz zaimplementowanie algorytmów do zbadania tych danych. Wykorzystałem do tego problemu wczęśniej wspomnianą bibliotekę leaflet. Stworzyłem Androidową kontrolkę WebView do której poprzez odpowiedni interfejs JavaScriptowy przekazałem aktualną pozycję z urządzenia GPS oraz sieci zeskanowane w zasięgu smartfonu. Ze względu na różnice Interfejsie klasy WebView, na przestrzeni lat zmienił się sposób uruchamiana JavaScriptu, lecz małe sprawdzenie i jesteśmy zgodni ze starym interfejsem oraz nowym.
+
+\begin{minted}{java}
+public void runJavascript(String code){
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+        webView.evaluateJavascript(code, null);
+    } else {
+        webView.loadUrl("javascript:("+code+");");
+    }
+}
+\end{minted}
+
+Ze względu na fakt, że wszystkie operacje są wykonywane w logice widoku, każde uśpienie aplikacji wstrzymywało pomiary i urządzenie GPS. Dodałem odpowiednią flagę do okna aplikacji, która poinformowała system o tym, żeby nie usypiać urządzenia w trakcie działania tej aplikacji.
+
+\begin{minted}{java}
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    webView = new WebView(this);
+    setContentView(webView);
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    \\ ...
+}
+\end{minted}
+
+Przy tworzeniu mapy, okazało się, że aplikacja internetowa nie posiadała odpowiednich nagłówków pozwalających na uruchamianie zapytań z innych domen. Rozwiązaniem tego problemu było dodanie odpowiednich nagłówków standardu Cross-Origin Resource Sharing. W przypadku aplikacji Ruby On Rails globalnie ten problem rozwiązałem przez import biblioteki rack-cors i konfigurację serwera aplikacji przy uruchamianiu:
+
+\begin{minted}{ruby}
+module RailsAppStartingTemplate
+  class Application < Rails::Application
+    # ...
+    config.middleware.insert_before 0, Rack::Cors do
+      allow do
+        origins '*'
+        resource '*', :headers => :any, :methods => [:get, :post, :options]
+      end
+    end
+    # ...
+  end
+end
+\end{minted}
+
+Samą prezentację oraz monitorowanie parametrów geolokacji rozwiązałem poprzez zapisanie ilości wykonanych geolokalizacji, zsumowanie wszystkich deklarowanych precyzji geolokalizacji (aby otrzymać średnią arytmetyczną) i zmierzenie otrzymanej lokalizacji w porównaniu do obecnej lokalizacji podanej przez GPS i zsumowanie jej do poprzednich wartości (dla średniej arytmetycznej).
+
+\begin{minted}{javascript}
+geowifiTimes += 1;
+geowifiAccuracy += parseFloat(data.accuracy || 0)
+geowifiMeasuredAccuracy += distance(gpsMarker.getLatLng().lat, gpsMarker.getLatLng().lng, data.location.lat, data.location.lng)
+wifiMarker.setLatLng([data.location.lat, data.location.lng]);
+fitMarkersIntoScreen();
+\end{minted}
+
+Dzięki temu, że interfejs geolokalizacji mojej aplikacji internetowej, działa podobnie w części geolokalizacji na podstawie sieci bezprzewodowych, to mogłem dodać bardzo niskim kosztem drugi serwer geolokacji i zmierzyć jego parametry. Obliczenie i prezentacja danych została zaimplementowana następująco:
+\begin{minted}{javascript}
+this._div.innerHTML = '<strong>Średni czas:</strong>';
+this._div.innerHTML += '<br>GeoWifi: ' + (  (((new Date()) - timeStart)/1000) / geowifiTimes ).toFixed(3) + ' s';
+this._div.innerHTML += '<br>Google: ' + (  (((new Date()) - timeStart)/1000) / googleTimes ).toFixed(3) + ' s';
+
+this._div.innerHTML += '<br><strong>Średnia deklarowana precyzja:</strong>';
+this._div.innerHTML += '<br>GeoWifi: ' + parseInt(  geowifiAccuracy / geowifiTimes ) + ' m';
+this._div.innerHTML += '<br>Google: ' + parseInt(  googleAccuracy / googleTimes ) + ' m';
+
+this._div.innerHTML += '<br><strong>Średnia zmierzona precyzja:</strong>';
+this._div.innerHTML += '<br>GeoWifi: ' + parseInt(  geowifiMeasuredAccuracy / geowifiTimes ) + ' m';
+this._div.innerHTML += '<br>Google: ' + parseInt(  googleMeasuredAccuracy / googleTimes ) + ' m';
+
+this._div.innerHTML += '<br><strong>Liczba geolokacji:</strong>';
+this._div.innerHTML += '<br>GeoWifi: ' + parseInt( geowifiTimes );
+this._div.innerHTML += '<br>Google: ' + parseInt(  googleTimes );
+\end{minted}
+
 
 \section{Badanie i wnioski}
+Na tym etapie pracy zauważyłem już, że zaimportowane dane z publicznych baz danych były bardzo ograniczone. Dla obszaru Warszawy zaimportowanych zostało mniej niż \textbf{200 tysięcy} pozycji sieci bezprzewodowych, co w porównaniu z szacowanymi \textbf{944 012} z części teoretycznej, zapowiadało porażkę. Dlatego dla obszarów mojego zamieszkania i miejsca pracy wykonałem kilka przejść z aplikacją i wyeksportowałem informacje o lokalizacjach sieci bezprzewodowych. Zagęszczenie w tych lokalizacjach zwięszyło się przynajmniej dwukrotnie.
 
-\begin{minted}{ruby}distance = 0.5
+\subsection{Pomiar zagęszczenia sieci bezprzewodowych na terenie Warszawy}
+Zagęszczenie w Warszawie oparłem na 3 próbkach. Dwie wybrane ręcznie ze względu na ograniczony zestaw informacji o lokalizacjach sieci bezprzewodowych oraz jeden wybrany losowo. Kod źródłowy obliczający gęstość sieci na km\textsuperscript{2} wyglądał następująco:
+
+\begin{minted}{ruby}
+distance = 0.5
 warsaw_spire_plac_europejski_1 = [52.232175, 20.984187]
 losowy = [52.273075, 20.974593]
 zeromskiego_1 = [ 52.275371, 20.960779]
@@ -194,3 +282,16 @@ Plac Europejski 1 & 993 \\
 \hline
 \end{tabular}
 \end{table}
+
+Wartości z Tablicy \refs{table:density_result} potwierdzają, że Warszawa posiada odpowiednią infrastrukturę sieci bezprzewodowych, aby nawigować po niej przy użyciu tylko lokalizacji sieci bezprzewodowych. Osobiście uważam, że dla rejonów centrum Warszawy powinniśmy zobaczyć wartości powyżej 3 lub 4 tysięcy. Jednak zeskanowanie lokalizacji sieci bezprzewodowych na obszarze kilometra kwadratowego to kosztowna operacja.
+
+\subsection{Pomiar precyzji geolokalizacji}
+W kwestii precyzji wyniki nie były bardzo satysfakcjonujące.\refs{fig:map-result} Zmierzona precyzja geolokalizacji nie osiągnęła minimalnej wymaganej określonej w tezie. Nie oznacza to, że nie można nawigować przy użyciu lokalizacji sieci bezprzewodowych. Oznacza to jedynie, że nie jest ona odpowiednią konkurencją dla urządzeń GPS. Osiągnięte wyniki jednak nie są bardzo złe. W przy średniej zmierzonej precyzji osiągnięto 50,513 metra dla sposobu przedstawionego w tej pracy. Oraz 55.074 dla platformy Google Maps. Zauważalna jest duża różnica w stosunku do deklarowanej precyzji przez obydwie platformy. Odpowiednio 243,948 metra dla aplikacji internetowej oraz 72,096 dla platformy Google. W pomiarze wystąpiły pełne 73 cykle geolokalizacji.
+
+\subsection{Pomiar szybkości geolokalizacji}
+Cały cykl, który był mierzony to od momentu ostatniej lokalizacji podanej przez serwer do kolejnej. W cyklu tym najdłużej zabierało zeskanowanie sieci bezprzewodowych przez urządzenie. \refs{fig:map-result} Na badanym urządzeniu udało się osiągnąć wynik 2.493 sekund na pełen cykl geolokalizacji. Jest to zadowalający wynik, jednak w aplikacjach nawigacyjnych podejrzewam, że trzeba byłoby kompensować tak niską częstotliwość odświeżania pozycji, szacunkami na podstawie kierunku i prędkości urządzenia.
+
+\subsection{Wnioski}
+Praca ta dowodzi, że Warszawa jest odpowiednio rozwiniętym i nowoczesnym miastem. Urządzenia są w stanie określać geolokalizację w odpowiedniej częstotliwości. Niestety jednak precyzja pozostawia wiele do życzenia. Możliwe jest stosowanie takiej geolokalizacji do urządzeń, w których niepotrzebna jest precyzyjna lokalizacja, a zmniejszone koszty geolokalizowania są pożądane. Takie urządzenia i ich zastosowania to mogą być krokomierze, systemy lokalizowania skradzionych przedmiotów — w tych przypadkach, geolokalizacja na podstawie sieci bezprzewodowych może mieć nawet lepsze efekty niż urządzenia GPS. Ze względu na ukrycie przedmiotu w pomieszczeniach nieprzepuszczających sygnałów satelity systemu GPS.
+
+Podsumowując, aby wykorzystać rozwiązanie geolokalizowania na podstawie sieci bezprzewodowych, trzeba opracować algorytmy, o lepszej precyzji geolokalizowania i utworzyć dokładniejsze bazy danych o lokalizacjach. Ewentualnie można wykorzystać to rozwiązanie do określania lokalizacji z precyzją rzędu od 50 metrów wzwyż.

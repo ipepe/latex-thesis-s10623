@@ -128,48 +128,99 @@ end
 
 \subsection{Algorytm geolokalizacji}
 
-Pierwotna wersja algorytmu zakładała podanie lokalizacji dla sieci bezprzewodowej o najmocniejszym sygnale, spośród wykrytych przez urządzenie użytkownika. Jednak to nie dawało zadowalających rezultatów. Lokalizacja podawana użytkownikowi dość często była po prostu niepoprawna.
+Rozwiązanie tego problemu składa się z dwóch części. Pierwszą jest widok — perspektywa - w bazie danych, której zadaniem jest podanie lokalizacji dla najmocniej zarejestrowanego sygnału sieci bezprzewodowej. Dodatkowym elementem tego widoku jest sortowanie po roku oraz tygodniu, w którym sieć została zaobserwowana. Dzięki temu mamy pewność świeżości danych o lokalizacji sieci bezprzewodowej.
 
-\begin{minted}{ruby}
-class WifiGeolocateService
-  def self.query(params)
-    return nil if params[:wifiAccessPoints].blank?
-    #TODO: save all params for future reference?
-    result = {
-      "location": {
-        "lat": nil,
-        "lng": nil
-      },
-      "accuracy": nil,
-      meta: []
-    }
-    params[:wifiAccessPoints].sort_by { |ap| ap[:signalStrength] }.reverse.each do |ap|
-      if (observation = WifiObservation.
-        where(bssid: WifiObservation.standardize_bssid(ap[:macAddress])).
-        order(observed_at: :desc).
-        first).present?
-        if result["accuracy"].blank?
-          result["location"]["lat"] ||= observation.latitude
-          result["location"]["lng"] ||= observation.longitude
-          result["accuracy"] ||= observation.geolocation_accuracy
-        end
-        result["meta"].push(observation.geojson_hash)
-      end
-    end
-    result
-  end
-end
+\begin{minted}{sql}
+CREATE MATERIALIZED VIEW wifi_positions AS
+  SELECT DISTINCT bssid, id, longitude, latitude,
+      json_build_object(
+        'type', 'Feature',
+        'geometry', json_build_object(
+          'type', 'Point',
+          'coordinates', json_build_array(
+            longitude,latitude
+          )
+        ),
+        'properties', json_build_object(
+          'id', id,
+          'bssid', bssid,
+          'ssid', ssid
+        )
+      )::text AS geojson, ssid
+  FROM wifi_observations
+  WHERE id = (
+    SELECT wo.id
+    FROM wifi_observations AS wo
+    WHERE wo.bssid = wifi_observations.bssid
+    ORDER BY
+      (SELECT EXTRACT(YEAR FROM wo.observed_at)) DESC,
+      (SELECT EXTRACT(WEEK FROM wo.observed_at)) DESC,
+      COALESCE((raw_info->>'signal_level'),'100')::int ASC NULLS LAST
+      LIMIT 1
 \end{minted}
 
-W kolejnych iteracjach powstał algorytm, którego podstawą działania jest średnia ważona współrzędnych geograficznych pozycji sieci bezprzewodowych o najmocniejszym sygnale, znalezionych na podstawie podanych adresów MAC, a gdzie waga będzie wyliczana na podstawie:
+Widok ten jest odświeżany wyzwalaczem przy każdej operacji modyfikującej tabelę wifi_observations.
 
-\begin{itemize}
-\item daty ostatniej obserwacji
-\item podanej siły sygnału
-\item nieliniowego współczynnika odchylenia lokalizacji od innych lokalizacji sieci bezprzewodowych — jego zadaniem jest eliminacja lub ograniczenie znaczenia sieci, których lokalizacja w bazie danych może być nieaktualna
-\end{itemize}
+\begin{minted}{sql}
+create or replace function refresh_wifi_positions()
+returns trigger language plpgsql
+as $$
+begin
+    refresh materialized view wifi_positions;
+    return null;
+end $$;
+create trigger refresh_wifi_positions_trigger
+after insert or update or delete or truncate
+on wifi_observations for each statement
+execute procedure refresh_wifi_positions();
+\end{minted}
 
-% TODO snippet algorytmu
+Drugim elementem algorytmu jest obliczenie geograficznego środka ciężkości — punktu środkowego — dla znalezionych przez urządzenie lokalizacji sieci bezprzewodowych. Wykorzystałem do tego bibliotekę Geocoder.
+
+\begin{minted}{ruby}
+positions = WifiPosition.where(bssid: params[:wifiAccessPoints].map do |ap|
+  WifiObservation.standardize_bssid(ap[:macAddress])
+end)
+
+Geocoder::Calculations.geographic_center(positions.map(&:coordinates))
+\end{minted}
+
+Warto jednak zajrzeć do implementacji metody geographic_center, ponieważ znajdziemy tam algorytm, który przelicza współrzędne geograficzne na trójwymiarowy układ kartezjański, po czym wylicza średnią wartość wyznaczonych punktów, a na koniec przelicza z powrotem na współrzędne geograficzne.
+
+\begin{minted}{ruby}
+##
+# Compute the geographic center (aka geographic midpoint, center of
+# gravity) for an array of geocoded objects and/or [lat,lon] arrays
+# (can be mixed). Any objects missing coordinates are ignored. Follows
+# the procedure documented at http://www.geomidpoint.com/calculation.html.
+#
+def geographic_center(points)
+
+  # convert objects to [lat,lon] arrays and convert degrees to radians
+  coords = points.map{ |p| to_radians(extract_coordinates(p)) }
+
+  # convert to Cartesian coordinates
+  x = []; y = []; z = []
+  coords.each do |p|
+    x << Math.cos(p[0]) * Math.cos(p[1])
+    y << Math.cos(p[0]) * Math.sin(p[1])
+    z << Math.sin(p[0])
+  end
+
+  # compute average coordinate values
+  xa, ya, za = [x,y,z].map do |c|
+    c.inject(0){ |tot,i| tot += i } / c.size.to_f
+  end
+
+  # convert back to latitude/longitude
+  lon = Math.atan2(ya, xa)
+  hyp = Math.sqrt(xa**2 + ya**2)
+  lat = Math.atan2(za, hyp)
+
+  # return answer in degrees
+  to_degrees [lat, lon]
+end
+\end{minted}
 
 \subsection{Specyfikacja do Geolokalizacji użytkownika}
 Interfejs do wykonania geolokalizacji przez aplikację internetową utworzyłem na podstawie specyfikacji produktu Google Maps.\cite{GoogleMapsGeolocationAPI} Oczywiście ta specyfikacja opisuje o wiele bardziej obszerne parametry do geolokalizacji. W ramach tej pracy zaimplementowałem parametry określające sieci bezprzewodowe: BSSID oraz siłę sygnału odebraną przez urządzenie.
