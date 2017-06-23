@@ -1,6 +1,6 @@
 
 \section{Aplikacja mobilna}
-Implementację aplikacji mobilnej rozpocząłem od kreatora, w którym wybrałem opcję pojedynczego Activity. Na początku zaimplementowałem odpowiednie algorytmy skanujące sieci bezprzewodowe w zasięgu. W kolejnym kroku dodałem obsługę urządzenia GPS. Następnie stworzyłem tabelę w bazie danych aplikacji mobilnej z odpowiednią strukturą do przechowywania zebranych obserwacji sieci bezprzewodowych. Na koniec zaimplementowałem prezentację geolokalizacji uzyskanej z aplikacji internetowe oraz możliwość eksportu zebranych obserwacji lokalizacji sieci bezprzewodowych.
+Implementację aplikacji mobilnej rozpocząłem od kreatora, w którym wybrałem opcję pojedynczego Activity. Na początku zaimplementowałem odpowiednie algorytmy skanujące sieci bezprzewodowe w zasięgu. W kolejnym kroku dodałem obsługę urządzenia GPS. Następnie stworzyłem tabelę w bazie danych aplikacji mobilnej z odpowiednią strukturą do przechowywania zebranych obserwacji sieci bezprzewodowych. Na koniec zaimplementowałem prezentację geolokalizacji uzyskanej z aplikacji internetowe oraz możliwość eksportu zebranych obserwacji lokalizacji sieci bezprzewodowych.
 
 \subsection{Uprawnienia na Android}
 
@@ -9,9 +9,9 @@ Począwszy od Androida 6.0 (poziom API 23), użytkownicy przyznają uprawnienia 
 Nowy system uprawnień wymaga dodatkowej uwagi twórców aplikacji mobilnych. Zanim
 
 \subsection{Skanowanie sieci bezprzewodowych}
-Klasycznym przykładem tego, jak Android został zaprojektowany, jest własnie skanowanie sieci bezprzewodowych. Aby uzyskać obiekty klasy ScanResults. Po pierwsze, musimy uzyskać instancję programu WifiManager. Następnie dziedzicząc po klasie BroadcastReceiver zaimplementować metodę, która dostanie powiadomienie o zakończeniu przetwarzania. Taki asynchroniczny odbiornik — WifiScanReceiver — rejestrujemy z parametrem WifiManager.SCAN_RESULTS_AVAILABLE_ACTION i wreszcie rozpocząć skanowanie przez metodę startScan() na instancji WifiManager.
+Klasycznym przykładem tego, jak Android został zaprojektowany, jest własnie skanowanie sieci bezprzewodowych. Aby uzyskać obiekty klasy ScanResults. Po pierwsze, musimy uzyskać instancję programu WifiManager. Następnie dziedzicząc po klasie BroadcastReceiver zaimplementować metodę, która dostanie powiadomienie o zakończeniu przetwarzania. Taki asynchroniczny odbiornik — WifiScanReceiver — rejestrujemy z parametrem SCAN\_RESULTS\_AVAILABLE\_ACTION i wreszcie rozpocząć skanowanie przez metodę startScan() na instancji WifiManager.
 
-\begin{minted}{java}
+\begin{minted}[breaklines=true]{java}
 wifi_manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 wifi_scan_reciever = new WifiScanReceiver();
 registerReceiver(wifi_scan_reciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -20,44 +20,26 @@ wifi_manager.startScan();
 
 I tu niespodzianka, bo w Androidzie nie mamy możliwości zaparametryzowania, że chcemy uzyskiwać wyniki o zeskanowanych sieciach w sposób ciągły. Musimy więc w naszym WifiScanReceiver zlecić ponowne skanowanie zaraz po otrzymaniu wyniku ostatniego skanowania. Tutaj jeszcze dodałem małe sprawdzenie, czy mamy aktualne współrzędne geograficzne do zapisania lokalizacji.
 
-\begin{minted}{java}
+\begin{minted}[breaklines=true]{java}
 private class WifiScanReceiver extends BroadcastReceiver {
-        public void onReceive(Context context, Intent intent) {
-            wifi_manager.startScan();
-            if( last_location != null && ( (1000*10) > Calendar.getInstance().getTime().getTime() - last_location.getTime())){
-                List<ScanResult> wifiScanList = wifi_manager.getScanResults();
-                for (ScanResult wifi : wifiScanList) {
-                    if( wifi.SSID.contains("_nomap") || wifi.SSID.contains("_optout") ){
-                        wifiScanList.remove(wifi);
-                    }
+    public void onReceive(Context context, Intent intent) {
+        wifi_manager.startScan();
+        if( last_location != null && ( (1000*10) > Calendar.getInstance().getTime().getTime() - last_location.getTime())){
+            List<ScanResult> wifiScanList = wifi_manager.getScanResults();
+            for (ScanResult wifi : wifiScanList) {
+                if( wifi.SSID.contains("_nomap") || wifi.SSID.contains("_optout") ){
+                    wifiScanList.remove(wifi);
                 }
-
-                JSONArray array = new JSONArray();
-                if (wifiScanList.size() == 0) {
-                    wifis.add(getString(R.string.no_networks));
-                } else {
-                    ActiveAndroid.beginTransaction();
-                    try {
-                        for (ScanResult wifi : wifiScanList) {
-                            WifiObservation wifiObservation = new WifiObservation(wifi, last_location);
-                            array.put(wifiObservation.toJson());
-                            wifiObservation.save();
-                        }
-                        ActiveAndroid.setTransactionSuccessful();
-                    } finally {
-                        ActiveAndroid.endTransaction();
-                    }
-                    runJavascript("geolocateByWifis("+array.toString()+")");
-                }
-
             }
+            // ...
         }
     }
+}
 \end{minted}
-W powyższym kodzie źródłowym widzimy usuwanie wyników zeskanowanych sieci z określonymi dopiskami. Wiąże się to z faktem, że Google zaproponowało dopisywanie do końca nazwy sieci \_nomap (z ang. nie mapuj), aby ich rozwiązania nie zbierały informacji o lokalizacji danych sieci bezprzewodowych.\cite{GoogleNomap} Dodatkowego zamieszania dorzuciła firma Microsoft, gdzie dla swoich rozwiązań zaproponowali \_optout (z ang. wypisz mnie).\cite{MicrosoftOptout}
+W powyższym kodzie źródłowym widzimy usuwanie wyników zeskanowanych sieci z określonymi dopiskami. Wiąże się to z faktem, że Google zaproponowało dopisywanie do końca nazwy sieci \_nomap (z ang. nie mapuj), aby ich rozwiązania nie zbierały informacji o lokalizacji danych sieci bezprzewodowych.\cite{GoogleNomap} Dodatkowego zamieszania dorzuciła firma Microsoft, gdzie dla swoich rozwiązań zaproponowali \_optout (z ang. wypisz mnie).\cite{MicrosoftOptout}
 
 \subsubsection{Problem z określeniem kierunku sygnału}
-Nie jest możliwym stwierdzenie, z jakiego kierunku przyszedł sygnał sieci bezprzewodowej. Powoduje to, że zbieranie informacji o lokalizacjach sieci bezprzewodowych jest skazane na dużą niedokładność. Konkretniej spowoduje to umiejscowienie wszystkich sieci bezprzewodowych na pozycji telefonu dla algorytmów bardzo prymitywnych Np. na środku ulicy lub na chodniku. Bardzo dobrze to widać na /refs{fig:poor-scan-result}
+Nie jest możliwym stwierdzenie, z jakiego kierunku przyszedł sygnał sieci bezprzewodowej. Powoduje to, że zbieranie informacji o lokalizacjach sieci bezprzewodowych jest skazane na dużą niedokładność. Konkretniej spowoduje to umiejscowienie wszystkich sieci bezprzewodowych na pozycji telefonu dla algorytmów bardzo prymitywnych Np. na środku ulicy lub na chodniku. Bardzo dobrze to widać na Rysunku \ref{fig:poor-scan-result}
 
 \begin{figure}[h!]
   \centering
@@ -73,9 +55,11 @@ Dzięki technologii MIMO można określić, z którego kierunku przyszedł sygna
 \subsection{Określanie lokalizacji urządzenia}
 Do obsługi lokalizacji urządzenia poprzez GPS wykorzystałem bibliotekę — SmartLocation. Użycie prostego interfejsu biblioteki zaoszczędziło dużo czasu, który musiałbym poświęcić na zapoznawanie się z dokumentacją klas i interfejsów dotyczących nawigacji w Androidzie.
 
-\begin{minted}{java}
+\begin{minted}[breaklines=true]{java}
 public void startGpsListener(){
-    SmartLocation.with(this).location().config(LocationParams.NAVIGATION).continuous().start(gps_location_listener);
+    SmartLocation.with(this).location()
+      .config(LocationParams.NAVIGATION).continuous()
+      .start(gps_location_listener);
 }
 private class GpsLocationListener implements OnLocationUpdatedListener {
     @Override
@@ -85,14 +69,14 @@ private class GpsLocationListener implements OnLocationUpdatedListener {
 }
 \end{minted}
 
-Sam proces uzyskania informacji o lokalizacji urządzenia jest asynchroniczny. Aby zniwelować efekt asynchroniczności, utworzyłem lokalną zmienną w ramach widoku, do której zapisuję ostatnią otrzymaną pozycję z SmartLocation. Do uzyskania najdokładniejszej pozycji skorzystałem z funkcji trybu nawigacji (z ang. navigate) z parametrem pracy ciągłej (z ang. continious). Trzeba pamiętać, że takie ustawienie jest niekorzystne dla czasu pracy na baterii, ale gwarantuje to najświeższą informację o współrzędnych urządzenia.
+Sam proces uzyskania informacji o lokalizacji urządzenia jest asynchroniczny. Aby zniwelować efekt asynchroniczności, utworzyłem lokalną zmienną w ramach widoku, do której zapisuję ostatnią otrzymaną pozycję z SmartLocation. Do uzyskania najdokładniejszej pozycji skorzystałem z funkcji trybu nawigacji (z ang. navigate) z parametrem pracy ciągłej (z ang. continious). Trzeba pamiętać, że takie ustawienie jest niekorzystne dla czasu pracy na baterii, ale gwarantuje to najświeższą informację o współrzędnych urządzenia.
 
 \subsection{Baza danych}
 Teraz gdy już mamy wyniki skanowania sieci bezprzewodowych i lokalizację urządzenia, to jesteśmy w stanie zapisać wyniki do bazy danych aplikacji mobilnej — aby potem przesłać do aplikacji internetowej — dla lepszej precyzji określania lokalizacji sieci bezprzewodowych, a tym samym użytkownika.
 
 Wybrałem bibliotekę ActiveAndroid jako ORM ze względu na swoje podobieństwo do ActiveRecord ze świata języka programowania Ruby oraz ze względu na użycie bazy SQLite, która jest popularnym rozwiązaniem do przechowywania danych na Androidzie. Stosując się do dobrych praktych twórców tej biblioteki, umieściłem tworzenie obserwacji w transakcji:
 
-\begin{minted}{java}
+\begin{minted}[breaklines=true]{java}
 ActiveAndroid.beginTransaction();
 try {
     for (ScanResult wifi : wifiScanList) {
@@ -108,8 +92,8 @@ try {
 Po raz kolejny podjąłem decyzję o denormalizacji danych. Dane takie będą zajmować więcej miejsca, ale umożliwią na dokładniejsze lokalizowanie miejsca, w którym jest umiejscowiony punkt dostępu. Wszystkie dane będą zapisane w pojedynczej tabeli.
 
 \begin{table}
-\caption{Kolumny i typy przechowywania danych wraz z ich znaczeniem}
-\label{table:dbscheme}
+\caption{Kolumny i typy przechowywania danych wraz z ich znaczeniem w aplikacji mobilnej}
+\label{table:mobiledbscheme}
 \begin{tabular} { |l|l|p{7cm}|  }
 \hline
 Typ & Nazwa & Znaczenie (opcjonalne) \\
@@ -119,29 +103,29 @@ String & ssid & \\
 \hline
 String & bssid & \\
 \hline
-int & signal_level & Wykryty poziom sygnału w dBm, znany również jako RSSI.\cite{scanResultAndroidDocs} \\
+int & signal\_level & Wykryty poziom sygnału w dBm, znany również jako RSSI.\cite{scanResultAndroidDocs} \\
 \hline
 String & capabilities & Opisuje schematy uwierzytelniania, zarządzania kluczami i szyfrowania obsługiwane przez punkt dostępu.\cite{scanResultAndroidDocs} \\
 \hline
-Date & observed_at & Data i czas o sieć została zeskanowana \\
+Date & observed\_at & Data i czas o sieć została zeskanowana \\
 \hline
-int & channel_frequency & Częstotliwość zeskanowanej sieci \\
+int & channel\_frequency & Częstotliwość zeskanowanej sieci \\
 \hline
 double & latitude & Szerokość geograficzna pozycji, w której sieć zeskanowano \\
 \hline
 double & longitude & Wysokość geograficzna pozycji, w której sieć zeskanowano \\
 \hline
-Date & geolocated_at & Data i czas otrzymania informacji o współrzędnych geograficznych urządzenia \\
+Date & geolocated\_at & Data i czas otrzymania informacji o współrzędnych geograficznych urządzenia \\
 \hline
-float & geolocation_accuracy & Dokładność współrzędnych geograficznych pozycji w któ®ej sieć zeskanowano \\
+float & geolocation\_accuracy & Dokładność współrzędnych geograficznych pozycji w któ®ej sieć zeskanowano \\
 \hline
-boolean & is_exported & Informacja o tym, czy sieć została wyeksportowana do aplikacji internetowej \\
+boolean & is\_exported & Informacja o tym, czy sieć została wyeksportowana do aplikacji internetowej \\
 \hline
 \end{tabular}
 \end{table}
 
-Konstruktor klasy WifiObservation przyjmujący zeskanowaną sieć oraz ostatnią lokalizację zaimplementowałem następująco:
-\begin{minted}{java}
+Konstruktor klasy WifiObservation przyjmujący zeskanowaną sieć oraz ostatnią lokalizację zaimplementowałem następująco:
+\begin{minted}[breaklines=true]{java}
 public WifiObservation(ScanResult scanResult, Location location){
     super();
     this.ssid = scanResult.SSID;
@@ -162,8 +146,8 @@ public WifiObservation(ScanResult scanResult, Location location){
 \end{minted}
 
 \subsection{Określenie identyfikatora urządzenia}
-Przy zbieraniu informacji o lokalizacjach sieci bezprzewodowych chciałem, aby dane obserwacje były oznaczone, przez jakie urządzenie zostały zaimportowane. Stosując się do dobrych praktyk, napisałem metodę, która przy pierwszym uruchomieniu generuje unikalny identyfikator i zapisuje go w przestrzeni ustawień aplikacji mobilnej. Każde następne uruchomienie, pobierze ten wcześniej wygenerowany identyfikator.
-\begin{minted}{java}
+Przy zbieraniu informacji o lokalizacjach sieci bezprzewodowych chciałem, aby dane obserwacje były oznaczone, przez jakie urządzenie zostały zaimportowane. Stosując się do dobrych praktyk, napisałem metodę, która przy pierwszym uruchomieniu generuje unikalny identyfikator i zapisuje go w przestrzeni ustawień aplikacji mobilnej. Każde następne uruchomienie, pobierze ten wcześniej wygenerowany identyfikator.
+\begin{minted}[breaklines=true]{java}
 public String getUniqueDeviceId(){
     SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
     String device_id = sharedPref.getString(preferenceUniqueIdKey, null);
@@ -178,9 +162,9 @@ public String getUniqueDeviceId(){
 \end{minted}
 
 \subsection{Prezentacja danych — mapa}
-Finalną częścią aplikacji mobilnej była prezentacja danych oraz zaimplementowanie algorytmów do zbadania tych danych. Wykorzystałem do tego problemu wczęśniej wspomnianą bibliotekę leaflet. Stworzyłem Androidową kontrolkę WebView do której poprzez odpowiedni interfejs JavaScriptowy przekazałem aktualną pozycję z urządzenia GPS oraz sieci zeskanowane w zasięgu smartfonu. Ze względu na różnice Interfejsie klasy WebView, na przestrzeni lat zmienił się sposób uruchamiana JavaScriptu, lecz małe sprawdzenie i jesteśmy zgodni ze starym interfejsem oraz nowym.
+Finalną częścią aplikacji mobilnej była prezentacja danych oraz zaimplementowanie algorytmów do zbadania tych danych. Wykorzystałem do tego problemu wczęśniej wspomnianą bibliotekę leaflet. Stworzyłem Androidową kontrolkę WebView do której poprzez odpowiedni interfejs JavaScriptowy przekazałem aktualną pozycję z urządzenia GPS oraz sieci zeskanowane w zasięgu smartfonu. Ze względu na różnice Interfejsie klasy WebView, na przestrzeni lat zmienił się sposób uruchamiana JavaScriptu, lecz małe sprawdzenie i jesteśmy zgodni ze starym interfejsem oraz nowym.
 
-\begin{minted}{java}
+\begin{minted}[breaklines=true]{java}
 public void runJavascript(String code){
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
         webView.evaluateJavascript(code, null);
@@ -192,19 +176,20 @@ public void runJavascript(String code){
 
 Ze względu na fakt, że wszystkie operacje są wykonywane w logice widoku, każde uśpienie aplikacji wstrzymywało pomiary i urządzenie GPS. Dodałem odpowiednią flagę do okna aplikacji, która poinformowała system o tym, żeby nie usypiać urządzenia w trakcie działania tej aplikacji.
 
-\begin{minted}{java}
+\begin{minted}[breaklines=true]{java}
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     webView = new WebView(this);
     setContentView(webView);
-    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    \\ ...
+    getWindow().addFlags(
+      WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    // ...
 }
 \end{minted}
 
 Przy tworzeniu mapy, okazało się, że aplikacja internetowa nie posiadała odpowiednich nagłówków pozwalających na uruchamianie zapytań z innych domen. Rozwiązaniem tego problemu było dodanie odpowiednich nagłówków standardu Cross-Origin Resource Sharing. W przypadku aplikacji Ruby On Rails globalnie ten problem rozwiązałem przez import biblioteki rack-cors i konfigurację serwera aplikacji przy uruchamianiu:
 
-\begin{minted}{ruby}
+\begin{minted}[breaklines=true]{ruby}
 module RailsAppStartingTemplate
   class Application < Rails::Application
     # ...
@@ -221,7 +206,7 @@ end
 
 Samą prezentację oraz monitorowanie parametrów geolokacji rozwiązałem poprzez zapisanie ilości wykonanych geolokalizacji, zsumowanie wszystkich deklarowanych precyzji geolokalizacji (aby otrzymać średnią arytmetyczną) i zmierzenie otrzymanej lokalizacji w porównaniu do obecnej lokalizacji podanej przez GPS i zsumowanie jej do poprzednich wartości (dla średniej arytmetycznej).
 
-\begin{minted}{javascript}
+\begin{minted}[breaklines=true]{javascript}
 geowifiTimes += 1;
 geowifiAccuracy += parseFloat(data.accuracy || 0)
 geowifiMeasuredAccuracy += distance(gpsMarker.getLatLng().lat, gpsMarker.getLatLng().lng, data.location.lat, data.location.lng)
@@ -230,7 +215,7 @@ fitMarkersIntoScreen();
 \end{minted}
 
 Dzięki temu, że interfejs geolokalizacji mojej aplikacji internetowej, działa podobnie w części geolokalizacji na podstawie sieci bezprzewodowych, to mogłem dodać bardzo niskim kosztem drugi serwer geolokacji i zmierzyć jego parametry. Obliczenie i prezentacja danych została zaimplementowana następująco:
-\begin{minted}{javascript}
+\begin{minted}[breaklines=true]{javascript}
 this._div.innerHTML = '<strong>Średni czas:</strong>';
 this._div.innerHTML += '<br>GeoWifi: ' + (  (((new Date()) - timeStart)/1000) / geowifiTimes ).toFixed(3) + ' s';
 this._div.innerHTML += '<br>Google: ' + (  (((new Date()) - timeStart)/1000) / googleTimes ).toFixed(3) + ' s';
@@ -253,24 +238,28 @@ this._div.innerHTML += '<br>Google: ' + parseInt(  googleTimes );
 Na tym etapie pracy zauważyłem już, że zaimportowane dane z publicznych baz danych były bardzo ograniczone. Dla obszaru Warszawy zaimportowanych zostało mniej niż \textbf{200 tysięcy} pozycji sieci bezprzewodowych, co w porównaniu z szacowanymi \textbf{944 012} z części teoretycznej, zapowiadało porażkę. Dlatego dla obszarów mojego zamieszkania i miejsca pracy wykonałem kilka przejść z aplikacją i wyeksportowałem informacje o lokalizacjach sieci bezprzewodowych. Zagęszczenie w tych lokalizacjach zwięszyło się przynajmniej dwukrotnie.
 
 \subsection{Pomiar zagęszczenia sieci bezprzewodowych na terenie Warszawy}
-Zagęszczenie w Warszawie oparłem na 3 próbkach. Dwie wybrane ręcznie ze względu na ograniczony zestaw informacji o lokalizacjach sieci bezprzewodowych oraz jeden wybrany losowo. Kod źródłowy obliczający gęstość sieci na km\textsuperscript{2} wyglądał następująco:
+Zagęszczenie w Warszawie oparłem na 3 próbkach. Dwie wybrane ręcznie ze względu na ograniczony zestaw informacji o lokalizacjach sieci bezprzewodowych oraz jeden wybrany losowo. Kod źródłowy obliczający gęstość sieci na km\textsuperscript{2} wyglądał następująco:
 
-\begin{minted}{ruby}
+\begin{minted}[breaklines=true]{ruby}
 distance = 0.5
 warsaw_spire_plac_europejski_1 = [52.232175, 20.984187]
 losowy = [52.273075, 20.974593]
 zeromskiego_1 = [ 52.275371, 20.960779]
 
 [
-  WifiPosition.within_bounding_box(Geocoder::Calculations.bounding_box(losowy, distance)).length,
-  WifiPosition.within_bounding_box(Geocoder::Calculations.bounding_box(warsaw_spire_plac_europejski_1, distance)).length,
-  WifiPosition.within_bounding_box(Geocoder::Calculations.bounding_box(zeromskiego_1, distance)).length
+  WifiPosition.within_bounding_box(
+    Geocoder::Calculations.bounding_box(losowy, distance)).length,
+  WifiPosition.within_bounding_box(
+    Geocoder::Calculations.bounding_box(
+    warsaw_spire_plac_europejski_1, distance)).length,
+  WifiPosition.within_bounding_box(
+    Geocoder::Calculations.bounding_box(zeromskiego_1, distance)).length
 ]
 \end{minted}
 
 \begin{table}
-\caption{Kolumny i typy przechowywania danych wraz z ich znaczeniem}
-\label{table:density_result}
+\caption{Wyniki pomiaru gęstości sieci bezprzewodowych}
+\label{table:densityResult}
 \begin{tabular} { |l|l|  }
 \hline
 Lokalizacja & Ilość bezprzewodowych sieci na km\textsuperscript{2} \\
@@ -283,13 +272,20 @@ Plac Europejski 1 & 993 \\
 \end{tabular}
 \end{table}
 
-Wartości z Tablicy \refs{table:density_result} potwierdzają, że Warszawa posiada odpowiednią infrastrukturę sieci bezprzewodowych, aby nawigować po niej przy użyciu tylko lokalizacji sieci bezprzewodowych. Osobiście uważam, że dla rejonów centrum Warszawy powinniśmy zobaczyć wartości powyżej 3 lub 4 tysięcy. Jednak zeskanowanie lokalizacji sieci bezprzewodowych na obszarze kilometra kwadratowego to kosztowna operacja.
+Wartości z Tablicy \ref{table:densityResult} potwierdzają, że Warszawa posiada odpowiednią infrastrukturę sieci bezprzewodowych, aby nawigować po niej przy użyciu tylko lokalizacji sieci bezprzewodowych. Osobiście uważam, że dla rejonów centrum Warszawy powinniśmy zobaczyć wartości powyżej 3 lub 4 tysięcy. Jednak zeskanowanie lokalizacji sieci bezprzewodowych na obszarze kilometra kwadratowego to kosztowna operacja.
 
 \subsection{Pomiar precyzji geolokalizacji}
-W kwestii precyzji wyniki nie były bardzo satysfakcjonujące.\refs{fig:map-result} Zmierzona precyzja geolokalizacji nie osiągnęła minimalnej wymaganej określonej w tezie. Nie oznacza to, że nie można nawigować przy użyciu lokalizacji sieci bezprzewodowych. Oznacza to jedynie, że nie jest ona odpowiednią konkurencją dla urządzeń GPS. Osiągnięte wyniki jednak nie są bardzo złe. W przy średniej zmierzonej precyzji osiągnięto 50,513 metra dla sposobu przedstawionego w tej pracy. Oraz 55.074 dla platformy Google Maps. Zauważalna jest duża różnica w stosunku do deklarowanej precyzji przez obydwie platformy. Odpowiednio 243,948 metra dla aplikacji internetowej oraz 72,096 dla platformy Google. W pomiarze wystąpiły pełne 73 cykle geolokalizacji.
+W kwestii precyzji wyniki nie były bardzo satysfakcjonujące, co widać na Rysunku \ref{fig:mapResult} Zmierzona precyzja geolokalizacji nie osiągnęła minimalnej wymaganej określonej w tezie. Nie oznacza to, że nie można nawigować przy użyciu lokalizacji sieci bezprzewodowych. Oznacza to jedynie, że nie jest ona odpowiednią konkurencją dla urządzeń GPS. Osiągnięte wyniki jednak nie są bardzo złe. W przy średniej zmierzonej precyzji osiągnięto 50,513 metra dla sposobu przedstawionego w tej pracy. Oraz 55.074 dla platformy Google Maps. Zauważalna jest duża różnica w stosunku do deklarowanej precyzji przez obydwie platformy. Odpowiednio 243,948 metra dla aplikacji internetowej oraz 72,096 dla platformy Google. W pomiarze wystąpiły pełne 73 cykle geolokalizacji.
+
+\begin{figure}
+  \centering
+    \includegraphics[width=8cm]{images/map-result}
+  \caption{Zrzut ekranu z aplikacji mobilnej na koniec pomiaru precyzji i szybkości geolokalizacji}
+  \label{fig:mapResult}
+\end{figure}
 
 \subsection{Pomiar szybkości geolokalizacji}
-Cały cykl, który był mierzony to od momentu ostatniej lokalizacji podanej przez serwer do kolejnej. W cyklu tym najdłużej zabierało zeskanowanie sieci bezprzewodowych przez urządzenie. \refs{fig:map-result} Na badanym urządzeniu udało się osiągnąć wynik 2.493 sekund na pełen cykl geolokalizacji. Jest to zadowalający wynik, jednak w aplikacjach nawigacyjnych podejrzewam, że trzeba byłoby kompensować tak niską częstotliwość odświeżania pozycji, szacunkami na podstawie kierunku i prędkości urządzenia.
+Cały cykl, który był mierzony to od momentu ostatniej lokalizacji podanej przez serwer do kolejnej. W cyklu tym najdłużej zabierało zeskanowanie sieci bezprzewodowych przez urządzenie. \ref{fig:mapResult} Na badanym urządzeniu udało się osiągnąć wynik 2.493 sekund na pełen cykl geolokalizacji. Jest to zadowalający wynik, jednak w aplikacjach nawigacyjnych podejrzewam, że trzeba byłoby kompensować tak niską częstotliwość odświeżania pozycji, szacunkami na podstawie kierunku i prędkości urządzenia.
 
 \subsection{Wnioski}
 Praca ta dowodzi, że Warszawa jest odpowiednio rozwiniętym i nowoczesnym miastem. Urządzenia są w stanie określać geolokalizację w odpowiedniej częstotliwości. Niestety jednak precyzja pozostawia wiele do życzenia. Możliwe jest stosowanie takiej geolokalizacji do urządzeń, w których niepotrzebna jest precyzyjna lokalizacja, a zmniejszone koszty geolokalizowania są pożądane. Takie urządzenia i ich zastosowania to mogą być krokomierze, systemy lokalizowania skradzionych przedmiotów — w tych przypadkach, geolokalizacja na podstawie sieci bezprzewodowych może mieć nawet lepsze efekty niż urządzenia GPS. Ze względu na ukrycie przedmiotu w pomieszczeniach nieprzepuszczających sygnałów satelity systemu GPS.

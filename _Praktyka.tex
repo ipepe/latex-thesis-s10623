@@ -52,7 +52,7 @@ radiocells.org (openbmap) & 1.6GB & baza danych sqlite \\
 Na podstawie importowanych danych przygotowałem strukturę bazy danych obserwacji. Uwzględniłem też kolumny, które będą potrzebne przy zbieraniu obserwacji z aplikacji mobilnej. Tablica \ref{table:dbscheme}
 
 \begin{table}
-\caption{Kolumny i typy przechowywania danych wraz z ich znaczeniem}
+\caption{Kolumny i typy przechowywania danych wraz z ich znaczeniem w aplikacji internetowej}
 \label{table:dbscheme}
 \begin{tabular} { |l|l|l|p{6cm}|  }
 \hline
@@ -86,9 +86,8 @@ datetime & updated\_at & & Data i czas modyfikacji rekordu (domyślnie dodawane 
 
 Dodatkowym problemem stała się samo BSSID. W każdej z importowanych baz zostało zapisane w inny sposób. Okazało się, że w ramach importu bazy ze strony mylnikov.org sposób zapisu BSSID się różni. Czasem wszystkie litery były duże. Innym razem wszystkie były małe. Aby ujednolicić zapis, utworzyłem odpowiednią metodę klasową, którą potem wykorzystałem we wszystkich miejscach, skąd przyjmowałem informacje o BSSID.
 
-\begin{minted}{ruby}
-def self.standardize_bssid(value)
-  # 00:0A:E6:3E:FD:E1
+\begin{minted}[breaklines=true]{ruby}
+def self.standardize_bssid(value) # value = '00:0A:E6:3E:FD:E1'
   result = value.to_s.upcase.gsub(/[^A-F0-9]/, '')
   return nil if result.size != 12
   result
@@ -106,7 +105,7 @@ Ze względu na ogrom danych, jakimi są zapisane lokalizacje sieci bezprzewodowy
 
 Samo generowanie struktury GeoJSON zaimplementowałem poprzez odpowiednie dwie metody:
 
-\begin{minted}{ruby}
+\begin{minted}[breaklines=true]{ruby}
 def geojson_hash
   {
     type: 'Feature',
@@ -128,9 +127,9 @@ end
 
 \subsection{Algorytm geolokalizacji}
 
-Rozwiązanie tego problemu składa się z dwóch części. Pierwszą jest widok — perspektywa - w bazie danych, której zadaniem jest podanie lokalizacji dla najmocniej zarejestrowanego sygnału sieci bezprzewodowej. Dodatkowym elementem tego widoku jest sortowanie po roku oraz tygodniu, w którym sieć została zaobserwowana. Dzięki temu mamy pewność świeżości danych o lokalizacji sieci bezprzewodowej.
+Rozwiązanie tego problemu składa się z dwóch części. Pierwszą jest widok — perspektywa - w bazie danych, której zadaniem jest podanie lokalizacji dla najmocniej zarejestrowanego sygnału sieci bezprzewodowej. Dodatkowym elementem tego widoku jest sortowanie po roku oraz tygodniu, w którym sieć została zaobserwowana. Dzięki temu mamy pewność świeżości danych o lokalizacji sieci bezprzewodowej.
 
-\begin{minted}{sql}
+\begin{minted}[breaklines=true]{sql}
 CREATE MATERIALIZED VIEW wifi_positions AS
   SELECT DISTINCT bssid, id, longitude, latitude,
       json_build_object(
@@ -159,16 +158,16 @@ CREATE MATERIALIZED VIEW wifi_positions AS
       LIMIT 1
 \end{minted}
 
-Widok ten jest odświeżany wyzwalaczem przy każdej operacji modyfikującej tabelę wifi_observations.
+Widok ten jest odświeżany wyzwalaczem przy każdej operacji modyfikującej tabelę wifi\_observations.
 
-\begin{minted}{sql}
+\begin{minted}[breaklines=true]{sql}
 create or replace function refresh_wifi_positions()
 returns trigger language plpgsql
-as $$
+as \$\$
 begin
     refresh materialized view wifi_positions;
     return null;
-end $$;
+end \$\$;
 create trigger refresh_wifi_positions_trigger
 after insert or update or delete or truncate
 on wifi_observations for each statement
@@ -177,17 +176,18 @@ execute procedure refresh_wifi_positions();
 
 Drugim elementem algorytmu jest obliczenie geograficznego środka ciężkości — punktu środkowego — dla znalezionych przez urządzenie lokalizacji sieci bezprzewodowych. Wykorzystałem do tego bibliotekę Geocoder.
 
-\begin{minted}{ruby}
+\begin{minted}[breaklines=true]{ruby}
 positions = WifiPosition.where(bssid: params[:wifiAccessPoints].map do |ap|
   WifiObservation.standardize_bssid(ap[:macAddress])
 end)
 
-Geocoder::Calculations.geographic_center(positions.map(&:coordinates))
+Geocoder::Calculations.geographic_center(
+  positions.map(&:coordinates))
 \end{minted}
 
-Warto jednak zajrzeć do implementacji metody geographic_center, ponieważ znajdziemy tam algorytm, który przelicza współrzędne geograficzne na trójwymiarowy układ kartezjański, po czym wylicza średnią wartość wyznaczonych punktów, a na koniec przelicza z powrotem na współrzędne geograficzne.
+Warto jednak zajrzeć do implementacji metody geographic\_center, ponieważ znajdziemy tam algorytm, który przelicza współrzędne geograficzne na trójwymiarowy układ kartezjański, po czym wylicza średnią wartość wyznaczonych punktów, a na koniec przelicza z powrotem na współrzędne geograficzne.
 
-\begin{minted}{ruby}
+\begin{minted}[breaklines=true]{ruby}
 ##
 # Compute the geographic center (aka geographic midpoint, center of
 # gravity) for an array of geocoded objects and/or [lat,lon] arrays
@@ -223,7 +223,7 @@ end
 \end{minted}
 
 \subsection{Specyfikacja do Geolokalizacji użytkownika}
-Interfejs do wykonania geolokalizacji przez aplikację internetową utworzyłem na podstawie specyfikacji produktu Google Maps.\cite{GoogleMapsGeolocationAPI} Oczywiście ta specyfikacja opisuje o wiele bardziej obszerne parametry do geolokalizacji. W ramach tej pracy zaimplementowałem parametry określające sieci bezprzewodowe: BSSID oraz siłę sygnału odebraną przez urządzenie.
+Interfejs do wykonania geolokalizacji przez aplikację internetową utworzyłem na podstawie specyfikacji produktu Google Maps.\cite{GoogleMapsGeolocationAPI} Oczywiście ta specyfikacja opisuje o wiele bardziej obszerne parametry do geolokalizacji. W ramach tej pracy zaimplementowałem parametry określające sieci bezprzewodowe: BSSID oraz siłę sygnału odebraną przez urządzenie.
 
 \subsection{Widoki}
 Wszystkie widoki aplikacji internetowej wykorzystują Boostrap oraz jQuery. Wykorzystanie tych bibliotek pozwala na szybkie tworzenie aplikacji, których użyteczność i estetyka są na zadowalającym poziome. Dodatkowo style Boostrapa są przystosowane do prezentacji widoków aplikacji w różnych rozdzielczościach ekranów. Nawet dla przeglądarek internetowych na smartfonach strona prezentuje się poprawnie i schludnie.
