@@ -30,10 +30,10 @@ private class WifiScanReceiver extends BroadcastReceiver {
                 if( wifi.SSID.contains("_nomap") || wifi.SSID.contains("_optout") ){
                     wifiScanList.remove(wifi);
 \end{minted}
-W powyższym kodzie źródłowym widzimy usuwanie wyników zeskanowanych sieci z określonymi dopiskami. Wiąże się to z faktem, że Google zaproponowało dopisywanie do końca nazwy sieci \_nomap (z ang. nie mapuj), aby ich rozwiązania nie zbierały informacji o lokalizacji danych sieci bezprzewodowych.\cite{GoogleNomap} Dodatkowego zamieszania dorzuciła firma Microsoft, gdzie dla swoich rozwiązań zaproponowali \_optout (z ang. wypisz mnie).\cite{MicrosoftOptout}
+W powyższym kodzie źródłowym widzimy usuwanie wyników zeskanowanych sieci z określonymi frazami w nazwie sieci. Wiąże się to z faktem, że firma Google zaproponowała dopisywanie do końca nazwy sieci frazę \_nomap (z ang. nie mapuj), aby ich produkty i rozwiązania nie zbierały informacji o lokalizacji danych sieci bezprzewodowych.\cite{GoogleNomap} Dodatkowego zamieszania dorzuciła firma Microsoft, gdzie dla swoich rozwiązań zaproponowali frazę \_optout (z ang. wypisz mnie).\cite{MicrosoftOptout}
 
 \subsubsection{Problem z określeniem kierunku sygnału}
-Nie jest możliwym stwierdzenie, z jakiego kierunku przyszedł sygnał sieci bezprzewodowej. Powoduje to, że zbieranie informacji o lokalizacjach sieci bezprzewodowych jest skazane na dużą niedokładność. Konkretniej spowoduje to umiejscowienie wszystkich sieci bezprzewodowych na pozycji telefonu dla algorytmów bardzo prymitywnych Np. na środku ulicy lub na chodniku. Bardzo dobrze to widać na Rysunku \ref{fig:poor-scan-result}
+Nie jest możliwym stwierdzenie, z jakiego kierunku przyszedł sygnał sieci bezprzewodowej w przypadku, gdy urządzenie posiada jedną kartę sieciową i posiadamy tylko jedną informację z lokalizacją i sygnałem sieci. Powoduje to, że zbieranie informacji o lokalizacjach sieci bezprzewodowych jest skazane na dużą niedokładność. Dla algorytmów bardzo prymitywnych spowoduje to umiejscowienie wszystkich sieci bezprzewodowych na pozycji telefonu np. na środku ulicy lub na chodniku. Bardzo dobrze to widać na Rysunku \ref{fig:poor-scan-result}
 
 \begin{figure}[h!]
   \centering
@@ -42,9 +42,7 @@ Nie jest możliwym stwierdzenie, z jakiego kierunku przyszedł sygnał sieci bez
   \label{fig:poor-scan-result}
 \end{figure}
 
-Rozwiązaniem lepsze, ale droższe byłoby użycie kilku urządzeń, najlepiej z antenami kierunkowymi, dzięki czemu moglibyśmy stwierdzić czy stacja bazowa znajduje się po lewej stronie ulicy, czy po prawej na podstawie siły sygnału.
-Dzięki technologii MIMO można określić, z którego kierunku przyszedł sygnał na jednym urządzeniu. Ze względu na denormalizację obserwacji sieci bezprzewodowych jesteśmy w stanie estymować kierunek, z którego przyszedł sygnał o ile mamy kilka zarejestrowanych skanów z różnymi siłami i lokalizacjami.
-
+Rozwiązanie lepsze, ale droższe, to użycie kilku urządzeń, najlepiej z antenami kierunkowymi, dzięki czemu moglibyśmy stwierdzić czy stacja bazowa znajduje się po lewej stronie ulicy, czy po prawej na podstawie różnicy w sile sygnału. Dzięki technologii MIMO można określić, z którego kierunku przyszedł sygnał wykorzystując jedno urządzenie. Ze względu na denormalizację obserwacji sieci bezprzewodowych jesteśmy w stanie estymować kierunek, z którego przyszedł sygnał o ile mamy kilka zarejestrowanych skanów z różnymi siłami i lokalizacjami.
 
 \subsection{Określanie lokalizacji urządzenia}
 Do obsługi lokalizacji urządzenia poprzez GPS wykorzystałem bibliotekę — SmartLocation. Użycie prostego interfejsu biblioteki zaoszczędziło dużo czasu, który musiałbym poświęcić na zapoznawanie się z dokumentacją klas i interfejsów dotyczących nawigacji w Androidzie.
@@ -68,7 +66,7 @@ Sam proces uzyskania informacji o lokalizacji urządzenia jest asynchroniczny. A
 \subsection{Baza danych}
 Teraz gdy już mamy wyniki skanowania sieci bezprzewodowych i lokalizację urządzenia, to jesteśmy w stanie zapisać wyniki do bazy danych aplikacji mobilnej — aby potem przesłać do aplikacji internetowej — dla lepszej precyzji określania lokalizacji sieci bezprzewodowych, a tym samym użytkownika.
 
-Wybrałem bibliotekę ActiveAndroid jako ORM ze względu na swoje podobieństwo do ActiveRecord ze świata języka programowania Ruby oraz ze względu na użycie bazy SQLite, która jest popularnym rozwiązaniem do przechowywania danych na Androidzie. Stosując się do dobrych praktych twórców tej biblioteki, umieściłem tworzenie obserwacji w transakcji:
+Wybrałem bibliotekę ActiveAndroid jako ORM ze względu na swoje podobieństwo do ActiveRecord ze środowiska języka programowania Ruby oraz ze względu na użycie bazy SQLite, która jest popularnym rozwiązaniem do przechowywania danych na Androidzie. Stosując się do dobrych praktych twórców tej biblioteki, umieściłem tworzenie obserwacji w transakcji:
 
 \begin{minted}[breaklines=true]{java}
 ActiveAndroid.beginTransaction();
@@ -140,7 +138,7 @@ public WifiObservation(ScanResult scanResult, Location location){
 \end{minted}
 
 \subsection{Określenie identyfikatora urządzenia}
-Przy zbieraniu informacji o lokalizacjach sieci bezprzewodowych chciałem, aby dane obserwacje były oznaczone, przez jakie urządzenie zostały zaimportowane. Stosując się do dobrych praktyk, napisałem metodę, która przy pierwszym uruchomieniu generuje unikalny identyfikator i zapisuje go w przestrzeni ustawień aplikacji mobilnej. Każde następne uruchomienie, pobierze ten wcześniej wygenerowany identyfikator.
+Przy zbieraniu informacji o lokalizacjach sieci bezprzewodowych chciałem, aby dane obserwacje były oznaczone, przez jakie urządzenie zostały zaimportowane. Stosując zalecane rozwiązanie, napisałem metodę, która przy pierwszym uruchomieniu generuje unikalny identyfikator i zapisuje go w przestrzeni ustawień aplikacji mobilnej. Każde następne uruchomienie, pobierze ten wcześniej wygenerowany identyfikator.\cite{SOSharedPrefreneces}
 \begin{minted}[breaklines=true]{java}
 public String getUniqueDeviceId(){
     SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
@@ -156,7 +154,7 @@ public String getUniqueDeviceId(){
 \end{minted}
 
 \subsection{Prezentacja danych — mapa}
-Finalną częścią aplikacji mobilnej była prezentacja danych oraz zaimplementowanie algorytmów do zbadania tych danych. Wykorzystałem do tego problemu wczęśniej wspomnianą bibliotekę leaflet. Stworzyłem Androidową kontrolkę WebView do której poprzez odpowiedni interfejs JavaScriptowy przekazałem aktualną pozycję z urządzenia GPS oraz sieci zeskanowane w zasięgu smartfonu. Ze względu na różnice Interfejsie klasy WebView, na przestrzeni lat zmienił się sposób uruchamiana JavaScriptu, lecz małe sprawdzenie i jesteśmy zgodni ze starym interfejsem oraz nowym.
+Finalną częścią aplikacji mobilnej była prezentacja danych oraz zaimplementowanie algorytmów do zbadania tych danych. Wykorzystałem do tego problemu wczęśniej wspomnianą bibliotekę leaflet. Stworzyłem Androidową kontrolkę WebView do której poprzez odpowiedni interfejs JavaScriptowy przekazałem aktualną pozycję z urządzenia GPS oraz sieci zeskanowane w zasięgu smartfonu. Ze względu na różnice w interfejsie klasy WebView, na przestrzeni lat zmienił się sposób uruchamiana JavaScriptu. Zaimplementowałem odpowiednie sprawdzenie, aby uzyskać zgodność ze starym oraz nowym interfejsem klasy WebView.
 
 \begin{minted}[breaklines=true]{java}
 public void runJavascript(String code){
@@ -208,7 +206,7 @@ wifiMarker.setLatLng([data.location.lat, data.location.lng]);
 fitMarkersIntoScreen();
 \end{minted}
 
-Dzięki temu, że interfejs geolokalizacji mojej aplikacji internetowej, działa podobnie w części geolokalizacji na podstawie sieci bezprzewodowych, to mogłem dodać bardzo niskim kosztem drugi serwer geolokacji i zmierzyć jego parametry. Obliczenie i prezentacja danych została zaimplementowana następująco:
+Dzięki temu, że interfejs geolokalizacji mojej aplikacji internetowej, działa zgodnie ze specyfikacją interfejsu produkty Mapy firmy Google w części geolokalizacji na podstawie sieci bezprzewodowych, to mogłem dodać bardzo niskim kosztem ich serwer geolokacji i zmierzyć jego parametry. Dla rozróżnienia, nadałem mojej aplikacji nazwę geowifi. Obliczenie i prezentacja danych została zaimplementowana następująco:
 \begin{minted}[breaklines=true]{javascript}
 this._div.innerHTML = '<strong>Średni czas:</strong>';
 this._div.innerHTML += '<br>GeoWifi: ' + (  (((new Date()) - timeStart)/1000) / geowifiTimes ).toFixed(3) + ' s';
@@ -229,10 +227,10 @@ this._div.innerHTML += '<br>Google: ' + parseInt(  googleTimes );
 
 
 \section{Badanie i wnioski}
-Na tym etapie pracy zauważyłem już, że zaimportowane dane z publicznych baz danych były bardzo ograniczone. Dla obszaru Warszawy zaimportowanych zostało mniej niż \textbf{200 tysięcy} pozycji sieci bezprzewodowych, co w porównaniu z szacowanymi \textbf{944 012} z części teoretycznej, zapowiadało porażkę. Dlatego dla obszarów mojego zamieszkania i miejsca pracy wykonałem kilka przejść z aplikacją i wyeksportowałem informacje o lokalizacjach sieci bezprzewodowych. Zagęszczenie w tych lokalizacjach zwięszyło się przynajmniej dwukrotnie.
+Na tym etapie pracy zauważyłem już, że zaimportowane dane z publicznych baz danych były bardzo ograniczone. Dla obszaru Warszawy zaimportowanych zostało mniej niż \textbf{200 tysięcy unikalnych} pozycji sieci bezprzewodowych, co w porównaniu z szacowanymi \textbf{944 012} z części teoretycznej, zapowiadało porażkę. Dlatego dla obszarów mojego zamieszkania i miejsca pracy wykonałem kilka przejść z aplikacją i wyeksportowałem informacje o lokalizacjach sieci bezprzewodowych. Szacuję , że zagęszczenie w tych lokalizacjach zwiększyło się przynajmniej dwukrotnie.
 
 \subsection{Pomiar zagęszczenia sieci bezprzewodowych na terenie Warszawy}
-Zagęszczenie w Warszawie oparłem na 3 próbkach. Dwie wybrane ręcznie ze względu na ograniczony zestaw informacji o lokalizacjach sieci bezprzewodowych oraz jeden wybrany losowo. Kod źródłowy obliczający gęstość sieci na km\textsuperscript{2} wyglądał następująco:
+Pomiar zagęszczenia w Warszawie oparłem na 3 próbkach. Dwie wybrane ręcznie ze względu na ograniczony zestaw informacji o lokalizacjach sieci bezprzewodowych oraz jeden wybrany losowo. Kod źródłowy obliczający gęstość sieci na km\textsuperscript{2} wyglądał następująco:
 
 \begin{minted}[breaklines=true]{ruby}
 distance = 0.5
@@ -266,12 +264,12 @@ Plac Europejski 1 & 993 \\
 \end{tabular}
 \end{table}
 
-Wartości z Tablicy \ref{table:densityResult} potwierdzają, że Warszawa posiada odpowiednią infrastrukturę sieci bezprzewodowych, aby nawigować po niej przy użyciu tylko lokalizacji sieci bezprzewodowych. Osobiście uważam, że dla rejonów centrum Warszawy powinniśmy zobaczyć wartości powyżej 3 lub 4 tysięcy. Jednak zeskanowanie lokalizacji sieci bezprzewodowych na obszarze kilometra kwadratowego to kosztowna operacja.
+Wartości z Tablicy \ref{table:densityResult} potwierdzają, że Warszawa posiada odpowiednią infrastrukturę sieci bezprzewodowych, aby nawigować po niej przy użyciu tylko lokalizacji sieci bezprzewodowych. Szacuję że dla rejonów centrum Warszawy powinniśmy zobaczyć wartości powyżej 3 lub 4 tysięcy. Jednak zeskanowanie lokalizacji sieci bezprzewodowych na obszarze kilometra kwadratowego to kosztowna operacja i podejrzewam to za główny powód niedokładności publicznych zbiorów danych.
 
 \subsection{Pomiar precyzji geolokalizacji}
-W kwestii precyzji wyniki nie były bardzo satysfakcjonujące, co widać na Rysunku \ref{fig:mapResult} Zmierzona precyzja geolokalizacji nie osiągnęła minimalnej wymaganej określonej w tezie. Nie oznacza to, że nie można nawigować przy użyciu lokalizacji sieci bezprzewodowych. Oznacza to jedynie, że nie jest ona odpowiednią konkurencją dla urządzeń GPS. Osiągnięte wyniki jednak nie są bardzo złe. W przy średniej zmierzonej precyzji osiągnięto 50,513 metra dla sposobu przedstawionego w tej pracy. Oraz 55.074 dla platformy Google Maps. Zauważalna jest duża różnica w stosunku do deklarowanej precyzji przez obydwie platformy. Odpowiednio 243,948 metra dla aplikacji internetowej oraz 72,096 dla platformy Google. W pomiarze wystąpiły pełne 73 cykle geolokalizacji.
+W kwestii precyzji wyniki nie były bardzo satysfakcjonujące, co widać na Rysunku \ref{fig:mapResult} Zmierzona precyzja geolokalizacji nie osiągnęła minimalnej wymaganej określonej w tezie. Nie oznacza to, że nie można nawigować przy użyciu lokalizacji sieci bezprzewodowych. Oznacza to jedynie, że nie jest ona odpowiednią konkurencją dla urządzeń GPS. Osiągnięte wyniki jednak nie są bardzo złe. W przy średniej zmierzonej precyzji osiągnięto 50,513 metra dla sposobu przedstawionego w tej pracy. Oraz 55,074 dla platformy Google Maps. Zauważalna jest duża różnica w stosunku do deklarowanej precyzji przez obydwie platformy. Odpowiednio 243,948 metra dla aplikacji internetowej (geowifi) oraz 72,096 dla platformy Google. W pomiarze wystąpiły pełne 73 cykle geolokalizacji.
 
-\begin{figure}
+\begin{figure}[h]
   \centering
     \includegraphics[width=8cm]{images/map-result}
   \caption{Zrzut ekranu z aplikacji mobilnej na koniec pomiaru precyzji i szybkości geolokalizacji}
@@ -279,9 +277,9 @@ W kwestii precyzji wyniki nie były bardzo satysfakcjonujące, co widać na Rysu
 \end{figure}
 
 \subsection{Pomiar szybkości geolokalizacji}
-Cały cykl, który był mierzony to od momentu ostatniej lokalizacji podanej przez serwer do kolejnej. W cyklu tym najdłużej zabierało zeskanowanie sieci bezprzewodowych przez urządzenie. \ref{fig:mapResult} Na badanym urządzeniu udało się osiągnąć wynik 2.493 sekund na pełen cykl geolokalizacji. Jest to zadowalający wynik, jednak w aplikacjach nawigacyjnych podejrzewam, że trzeba byłoby kompensować tak niską częstotliwość odświeżania pozycji, szacunkami na podstawie kierunku i prędkości urządzenia.
+W każdym cyklu tym najwięcej czasu zajmowało zeskanowanie sieci bezprzewodowych przez urządzenie. Na badanym urządzeniu udało się osiągnąć wynik 2.493 sekund na pełen cykl geolokalizacji.(Rysunek \ref{fig:mapResult}) Jest to zadowalający wynik, jednak w aplikacjach nawigacyjnych podejrzewam, że trzeba byłoby kompensować tak niską częstotliwość odświeżania pozycji, szacunkami na podstawie kierunku i prędkości urządzenia.
 
 \subsection{Wnioski}
-Praca ta dowodzi, że Warszawa jest odpowiednio rozwiniętym i nowoczesnym miastem. Urządzenia są w stanie określać geolokalizację w odpowiedniej częstotliwości. Niestety jednak precyzja pozostawia wiele do życzenia. Możliwe jest stosowanie takiej geolokalizacji do urządzeń, w których niepotrzebna jest precyzyjna lokalizacja, a zmniejszone koszty geolokalizowania są pożądane. Takie urządzenia i ich zastosowania to mogą być krokomierze, systemy lokalizowania skradzionych przedmiotów — w tych przypadkach, geolokalizacja na podstawie sieci bezprzewodowych może mieć nawet lepsze efekty niż urządzenia GPS. Ze względu na ukrycie przedmiotu w pomieszczeniach nieprzepuszczających sygnałów satelity systemu GPS.
+Praca ta dowodzi, że Warszawa jest odpowiednio rozwiniętym i nowoczesnym miastem. Urządzenia są w stanie określać geolokalizację w odpowiedniej częstotliwości. Niestety jednak precyzja pozostawia wiele do życzenia. Możliwe jest stosowanie takiej geolokalizacji do urządzeń, w których niepotrzebna jest precyzyjna lokalizacja, a zmniejszone koszty zużycia baterii dla geolokalizowania są pożądane. Takie urządzenia i ich zastosowania to mogą być krokomierze, systemy lokalizowania skradzionych przedmiotów — w tych przypadkach, geolokalizacja na podstawie sieci bezprzewodowych może mieć nawet lepsze efekty niż urządzenia GPS ze względu na fakt, że technologia GPS wymaga dostępu do tzw. otwartego nieba.
 
-Podsumowując, aby wykorzystać rozwiązanie geolokalizowania na podstawie sieci bezprzewodowych, trzeba opracować algorytmy, o lepszej precyzji geolokalizowania i utworzyć dokładniejsze bazy danych o lokalizacjach. Ewentualnie można wykorzystać to rozwiązanie do określania lokalizacji z precyzją rzędu od 50 metrów wzwyż.
+Podsumowując: aby wykorzystać rozwiązanie geolokalizowania na podstawie sieci bezprzewodowych, trzeba opracować algorytmy, o lepszej precyzji i utworzyć dokładniejsze bazy danych o lokalizacjach. Ewentualnie można wykorzystać to rozwiązanie do określania lokalizacji z precyzją rzędu ponad 50 metrów.
