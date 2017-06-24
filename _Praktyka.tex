@@ -94,7 +94,7 @@ def self.standardize_bssid(value) # value = '00:0A:E6:3E:FD:E1'
 end
 \end{minted}
 
-Ze względu na prędkość importu zdecydowałem się zdenormalizować obserwacje punktów dostępów. Kolumna BSSID — opisująca adres sprzętowy urządzenia będzie posiadała powtarzające się dane. Dzięki temu mogłem użyć biblioteki activerecord-import, która pozwala na import danych do bazy danych poprzez bardzo praktyczny interfejs, ale przede wszystkim w sposób bardzo szybki. Dzięki tej decyzji import informacji o lokalizacjach sieci bezprzewodowych dla obszaru Warszawy zajął niecałe 6 godzin na moim komputerze. Warto tu wspomnieć, że zakres importowanych danych to mniej niż 1\% z całego publicznego zbioru informacji o lokalizacjach sieci bezprzewodowych. Tablica \ref{table:warsarPerDump}
+Ze względu na optymalizację procesu importu obserwacji sieci bezprzewodowych zdecydowałem się zdenormalizować obserwacje punktów dostępów. Kolumna BSSID — opisująca adres sprzętowy urządzenia będzie posiadała powtarzające się dane. Dzięki temu mogłem użyć biblioteki activerecord-import, która pozwala na import danych do bazy danych poprzez bardzo praktyczny interfejs, ale przede wszystkim w sposób bardzo szybki. Dzięki tej decyzji import informacji o lokalizacjach sieci bezprzewodowych dla obszaru Warszawy zajął niecałe 6 godzin na moim komputerze. Warto tu wspomnieć, że zakres importowanych danych to mniej niż 1\% z całego publicznego zbioru informacji o lokalizacjach sieci bezprzewodowych. Tablica \ref{table:warsarPerDump}
 
 \begin{table}
 \caption{Ilość i stosunek zaimportowanych danych o lokalizacjach sieci bezprzewodowych tylko dla regionu Warszawy}
