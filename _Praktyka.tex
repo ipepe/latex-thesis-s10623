@@ -2,7 +2,7 @@
 W rozdziale tym przedstawię proces utworzenia aplikacji internetowej oraz mobilnej. Omówię wyzwania oraz problemy, z którymi się spotkałem podczas implementacji. Opiszę też zasadę działania algorytmów potrzebnych do realizacji podstawowych założeń aplikacji mobilnej oraz internetowej. Na koniec przeprowadzę badania i wyciągnę wnioski, które skonfrontuje z postawioną tezą.
 
 \section{Przygotowanie}
-Aby rozpocząć prace nad utworzeniem aplikacji internetowej i mobilnej potrzebny jest warsztat sprzętowy oraz odpowiedniego oprogramowania zainstalowanego i skonfigurowanego na danym sprzęcie.
+Aby rozpocząć prace nad utworzeniem aplikacji internetowej i mobilnej potrzebny jest warsztat sprzętowy oraz odpowiednie oprogramowanie zainstalowane i skonfigurowane na danym sprzęcie.
 
 \subsection{Sprzęt}
 Do wytworzenia aplikacji internetowej oraz mobilnej potrzebny jest komputer. W moim przypadku środowisko programistyczne zainstalowałem i skonfigurowałem na MacBooku Pro z 2011 roku. Do celów badawczych pracy potrzebny mi był smartfon z systemem operacyjnym Android. Wykorzystałem do tego zadania LG Nexus 5. Dodatkowo, jeżeli mamy smartfon z systemem Android to nie musimy konfigurować emulatora, co w przypadku mojego komputera mogłoby bardzo ograniczyć zasoby pamięci RAM.
@@ -24,7 +24,7 @@ PostgreSQL na środowiska Mac OS można ściągnąć w postaci zwykłej aplikacj
 Najprostszym sposobem wytwarzania oprogramowania dla systemów Android jest korzystanie z pakietu Android Studio. Najnowsza wersja na dzień utworzenia projektu to 2.3.2. W ramach instalacji tego środowiska programistycznego zostało zainstalowanych wiele bibliotek. Między innymi SDK Manager, w którym zainstalowałem SDK Platformy o oznaczeniu Android 7.1.1 (Nougat), której poziom API to 25.
 
 \subsubsection{Przeglądarka internetowa}
-Gdy mowa o aplikacji internetowej, to nie można zapomnieć o jej kliencie — przeglądarce internetowej. Przy rozwoju aplikacji opartej na Ruby on Rails, nie ma większego znaczenia, z jakiej przeglądarki skorzystamy. Osobiście jednak polecam, aby na komputerze posiadać przeglądarki kilku firm, ze względu na kompatybilność. Jak się dowiemy w późniejszych rozdziałach, ma to znaczenie przy rozwoju takiej aplikacji internetowej.
+Gdy mowa o aplikacji internetowej, to nie można zapomnieć o jej kliencie — przeglądarce internetowej. Przy rozwoju aplikacji opartej na Ruby on Rails, nie ma większego znaczenia, z jakiej przeglądarki skorzystamy. Osobiście jednak polecam, aby na komputerze posiadać przeglądarki kilku firm, ze względu na kompatybilność i różnice w wydajności przetwarzanych danych. 
 
 \section{Aplikacja internetowa}
 Implementację rozpocząłem od importu istniejących danych o lokalizacjach sieci WIFI z różnych serwisów. Potem skupiłem się na prezentacji zaimportowanych danych. Na koniec stworzyłem ścieżkę, pod którą można geolokalizować na podstawie podanych adresów MAC i siły sygnałów podanych sieci bezprzewodowych.
@@ -44,7 +44,7 @@ openwifi.su (openwlanmap.org) & 245,7MB & CSV spakowany do tar.bz2 \\
 \hline
 mylnikov.org & 657 MB & CSV spakowany do zip \\
 \hline
-radiocells.org (openbmap) & 1.6GB & baza danych sqlite \\
+radiocells.org & 1.6GB & baza danych sqlite \\
 \hline
 \end{tabular}
 \end{table}
@@ -94,14 +94,36 @@ def self.standardize_bssid(value) # value = '00:0A:E6:3E:FD:E1'
 end
 \end{minted}
 
-Ze względu na prędkość importu zdecydowałem się zdenormalizować obserwacje punktów dostępów. Kolumna BSSID — opisującą adres sprzętowy urządzenia będzie posiadała powtarzające się dane. Dzięki temu mogłem użyć biblioteki activerecord-import. Która pozwala na import danych do bazy danych poprzez bardzo praktyczny interfejs, ale przede wszystkim w sposób bardzo szybki. Dzięki tej decyzji import informacji o lokalizacjach sieci bezprzewodowych dla obszaru Warszawy zajął prawie 6 godzin na moim komputerze.
+Ze względu na prędkość importu zdecydowałem się zdenormalizować obserwacje punktów dostępów. Kolumna BSSID — opisująca adres sprzętowy urządzenia będzie posiadała powtarzające się dane. Dzięki temu mogłem użyć biblioteki activerecord-import, która pozwala na import danych do bazy danych poprzez bardzo praktyczny interfejs, ale przede wszystkim w sposób bardzo szybki. Dzięki tej decyzji import informacji o lokalizacjach sieci bezprzewodowych dla obszaru Warszawy zajął niecałe 6 godzin na moim komputerze. Warto tu wspomnieć, że zakres importowanych danych to mniej niż 1\% z całego publicznego zbioru informacji o lokalizacjach sieci bezprzewodowych. Tablica \ref{table:warsarPerDump}
+
+\begin{table}
+\caption{Ilość i stosunek zaimportowanych danych o lokalizacjach sieci bezprzewodowych tylko dla regionu Warszawy}
+\label{table:warsarPerDump}
+\begin{tabular}{ |l|l|p{4cm}|p{4cm}|  }
+\hline
+Zaimportowano & Wszystkich & Stosunek zaimportowanych do wszystkich & Źródło importowanych danych \\
+\hline
+\hline
+32534  & 11260797 & \textasciitilde3\textperthousand & radiocells.org \\
+\hline
+358916 & 37841215 & \textasciitilde9\textperthousand & mylnikov.org \\
+\hline
+151365 & 15636591 & \textasciitilde10\textperthousand& openwifi.su (openwlanmap.org) \\
+\hline
+\hline
+\multicolumn{4}{|c|}{łącznie} \\
+\hline
+542815 & 64738603 & \textasciitilde8,385\textperthousand & - \\
+\hline
+\end{tabular}
+\end{table}
 
 \subsection{Prezentacja danych na mapie}
 Do prezentacji danych, jakimi są lokalizacje sieci bezprzewodowych, wykorzystałem gotową bibliotekę Leaflet. Wykorzystywanie gotowych elementów interfejsu często przyspiesza pracę nad projektami. Zwłaszcza tak skomplikowanego interfejsu, jakim jest mapa. Sama biblioteka implementuje obsługę współrzędnych geograficznych, przybliżania i oddalania oraz prostych znaczków i kształtów geograficznych. Podstawowym elementem, jaki musiałem dodać to grafiki mapy — tzw. płytki map (z ang. map tiles). Mój wybór padł na dostawcę darmowych grafik — serwis CartoDB. Udostępniają oni wysokiej jakości, schludne grafiki do wyboru w kilku odcieniach. Na potrzeby tej pracy wybrałem minimalistyczną i ciemną wersję o nazwie dark. Do Leafleta dodałem jeszcze dwa dodatki: jeden odpowiedzialny za pobieranie danych standardem AJAX oraz drugi, który jest odpowiedzialny za klastrowanie dużej ilości znaczników na mapie w grupy.
 
 Dla widoku mapy utworzyłem ścieżkę na serwerze, pod którą można pobrać znaczniki z lokalizacjami sieci bezprzewodowych. Zdecydowałem się na strukturę danych określoną w standardzie GeoJSON ze względu na kompatybilność z biblioteką Leaflet, dodatkowo stosując takie rozwiązanie, interfejs programistyczny jest bardziej przystępny do wykorzystania.
 
-Ze względu na ogrom danych, jakimi są zapisane lokalizacje sieci bezprzewodowych, potrzebne jest wykorzystanie mechanizmu AJAX i ograniczenia przesyłanych danych do 25 tysięcy struktur GeoJSON. To ograniczenie wynika z wydajności przeglądarki do prezentacji tak dużej ilości danych. Więcej i przeglądarka Firefox miała kilkusekundowe przestoje podczas przeładowywania danych.
+Ze względu na ogrom danych, jakimi są zapisane lokalizacje sieci bezprzewodowych, potrzebne jest wykorzystanie mechanizmu AJAX i ograniczenia przesyłanych danych do 25 tysięcy struktur GeoJSON. To ograniczenie wynika z wydajności przeglądarki do prezentacji tak dużej ilości danych. Zauważyć można było, że przeglądarka Firefox zawieszała się na kilka sekund podczas ładowania danych większych niż wcześniej opisane ograniczenie.
 
 Samo generowanie struktury GeoJSON zaimplementowałem poprzez odpowiednie dwie metody:
 

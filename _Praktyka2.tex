@@ -18,7 +18,7 @@ registerReceiver(wifi_scan_reciever, new IntentFilter(WifiManager.SCAN_RESULTS_A
 wifi_manager.startScan();
 \end{minted}
 
-I tu niespodzianka, bo w Androidzie nie mamy możliwości zaparametryzowania, że chcemy uzyskiwać wyniki o zeskanowanych sieciach w sposób ciągły. Musimy więc w naszym WifiScanReceiver zlecić ponowne skanowanie zaraz po otrzymaniu wyniku ostatniego skanowania. Tutaj jeszcze dodałem małe sprawdzenie, czy mamy aktualne współrzędne geograficzne do zapisania lokalizacji.
+W Androidzie nie ma możliwości zparametryzowania, że chcemy uzyskiwać wyniki o zeskanowanych sieciach w sposób ciągły. Musimy więc w naszym WifiScanReceiver zlecić ponowne skanowanie zaraz po otrzymaniu wyniku ostatniego skanowania. Warto w tym miejscu dopisać sprawdzenie, czy współrzędne geograficzne ostatnio zapisane z urządzenia GPS są aktualne. W przeciwnym przypadku nie zapisywać informacji o lokalizacji ze względu na nieaktualność posiadanych współrzędnych.
 
 \begin{minted}[breaklines=true]{java}
 private class WifiScanReceiver extends BroadcastReceiver {
@@ -29,12 +29,6 @@ private class WifiScanReceiver extends BroadcastReceiver {
             for (ScanResult wifi : wifiScanList) {
                 if( wifi.SSID.contains("_nomap") || wifi.SSID.contains("_optout") ){
                     wifiScanList.remove(wifi);
-                }
-            }
-            // ...
-        }
-    }
-}
 \end{minted}
 W powyższym kodzie źródłowym widzimy usuwanie wyników zeskanowanych sieci z określonymi dopiskami. Wiąże się to z faktem, że Google zaproponowało dopisywanie do końca nazwy sieci \_nomap (z ang. nie mapuj), aby ich rozwiązania nie zbierały informacji o lokalizacji danych sieci bezprzewodowych.\cite{GoogleNomap} Dodatkowego zamieszania dorzuciła firma Microsoft, gdzie dla swoich rozwiązań zaproponowali \_optout (z ang. wypisz mnie).\cite{MicrosoftOptout}
 
