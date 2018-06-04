@@ -185,11 +185,11 @@ Widok ten jest odświeżany wyzwalaczem przy każdej operacji modyfikującej tab
 \begin{minted}[breaklines=true]{sql}
 create or replace function refresh_wifi_positions()
 returns trigger language plpgsql
-as \$\$
+as $$
 begin
     refresh materialized view wifi_positions;
     return null;
-end \$\$;
+end $$;
 create trigger refresh_wifi_positions_trigger
 after insert or update or delete or truncate
 on wifi_observations for each statement
